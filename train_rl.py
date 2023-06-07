@@ -24,6 +24,7 @@ from datetime import datetime
 import wandb
 
 LOGGER = logging.getLogger(__name__)
+os.environ['PYOPENGL_PLATFORM'] = 'egl'
 
 
 def parse_args():
