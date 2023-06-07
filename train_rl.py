@@ -1,3 +1,6 @@
+from pyvirtualdisplay import Display
+display = Display(visible=0, size=(1400, 900))
+display.start()
 import argparse
 import sys
 import os
@@ -92,9 +95,6 @@ def set_exp_name(args):
 
 
 def main(cmd_args=None):
-    from pyvirtualdisplay import Display
-    display = Display(visible=0, size=(1400, 900))
-    display.start()
     # parse arguments
     args = parse_args()
 
