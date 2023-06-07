@@ -18,6 +18,9 @@
     },
     "restarts": 1,
     "samples": 1,
+    "fixed_params": {
+        "test_resume": false
+      },    
     "hyperparam_list": [
       {
         "param": "args.name",
