@@ -90,13 +90,19 @@ def set_exp_name(args):
     return exp_name
 
 
-def main():
+def main(cmd_args=None):
     # parse arguments
     args = parse_args()
 
+    if cmd_args:
+        args_d = vars(args)
+        for key in cmd_args:
+            args_d[key] = cmd_args[key]
+
     if not args.wandb:
         os.environ["WANDB_MODE"] = "offline"
-
+    print(f"Main have been called")
+    quit()
     # fix seed
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
