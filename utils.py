@@ -701,12 +701,13 @@ def miniworld_loader(batch_size):
 
 # D4RL
 class D4RLDataset(Dataset):
-    def __init__(self, env_name, sample_traj = True, traj_length=50, num_traj=2000):
+    def __init__(self, env_name, partition,sample_traj = True, traj_length=50, num_traj=2000):
         self.sample_traj = sample_traj
         self.traj_length = traj_length
         self.num_traj = num_traj
+        self.partition = partition
+        holdout = 50
         # load d4rl dataset
-        _, env_name = env_name.split('_', 1)
         env = gym.make(env_name)
         env.reset()
         self.dataset = d4rl.qlearning_dataset(env)
@@ -726,7 +727,10 @@ class D4RLDataset(Dataset):
                 if len(trajectories) == num_traj:
                     break
                 ind += 1
-            self.trajectories = trajectories
+            if self.partition:
+                self.trajectories = trajectories[:holdout]
+            else:
+                self.trajectories = trajectories
             self.obs_size = states[0].shape[0]
             self.action_size = actions[0].shape[0]
         else:
@@ -764,3 +768,13 @@ class D4RLDataset(Dataset):
                 
 
 
+def d4rl_loader(batch_size, env_name):
+    train_dataset = D4RLDataset(env_name, False, sample_traj=True)
+    test_dataset = D4RLDataset(env_name, True, sample_traj=True)
+    train_loader = DataLoader(
+        dataset=train_dataset, batch_size=batch_size, shuffle=True, drop_last=False
+    )
+    test_loader = DataLoader(
+        dataset=test_dataset, batch_size=len(test_dataset), shuffle=False
+    )
+    return train_loader, test_loader

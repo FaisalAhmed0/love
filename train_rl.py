@@ -157,6 +157,21 @@ def main():
             feat_size=args.belief_size,
         )
         output_normal = False
+    
+    elif "d4rl" in args.dataset_path:
+        train_loader, test_loader = utils.d4rl_loader(args.batch_size, args.name)
+        action_encoder = GridActionEncoder(
+            action_size=train_loader.dataset.action_size,
+            embedding_size=args.belief_size,
+        )
+        encoder = modules.MiniWorldEncoderPano(input_dim=3)
+        decoder = GridDecoder(
+            input_size=args.belief_size,
+            action_size=train_loader.dataset.action_size,
+            feat_size=args.belief_size,
+        )
+        output_normal = True
+
     else:
         raise ValueError(f"Unrecognize dataset_path {args.dataset_path}")
 
