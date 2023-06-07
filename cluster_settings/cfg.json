@@ -23,43 +23,43 @@
       },    
     "hyperparam_list": [
       {
-        "param": "args.name",
+        "param": "name",
         "values":[ "maze2d-open-v0"]
       },
       {
-        "param": "args.coding_len_coeff",
+        "param": "coding_len_coeff",
         "values": [0.005]
       },
       {
-        "param": "args.kl_coeff",
+        "param": "kl_coeff",
         "values": [0.0]
       },
       {
-        "param": "args.rec_coeff",
+        "param": "rec_coeff",
         "values": [1.0]
       },
       {
-        "param": "args.batch-size",
+        "param": "batch-size",
         "values": [64]
       },
       {
-        "param": "args.dataset-path",
+        "param": "dataset-path",
         "values": ["d4rl"]
       },
       {
-        "param": "args.max-iters",
+        "param": "max-iters",
         "values": [20000]
       },
       {
-        "param": "args.state-size",
+        "param": "state-size",
         "values": [8]
       },
       {
-        "param": "args.use_min_length_boundary_mask",
+        "param": "use_min_length_boundary_mask",
         "values": ["use_min_length_boundary_mask"]
       },
       {
-        "param": "args.latent-n",
+        "param": "latent-n",
         "values":[10]
       }
     ]
