@@ -94,7 +94,7 @@ def set_exp_name(args):
     return exp_name
 
 
-def main(cmd_args=None):
+def main_f(cmd_args=None):
     # parse arguments
     args = parse_args()
 
@@ -473,4 +473,4 @@ def main(cmd_args=None):
 
 
 if __name__ == "__main__":
-    main()
+    main_f()
