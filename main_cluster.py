@@ -17,7 +17,7 @@ if __name__ == "__main__":
     print("params")
     print(params)
     print(type(params))
-    main_f(cmd_args=params)
+    main_f(cmd_args=dict(params))
     # simulate that the jobs take some time
     max_sleep_time = params.get("max_sleep_time", 10)
     time.sleep(np.random.randint(0, max_sleep_time))
