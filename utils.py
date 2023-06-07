@@ -11,6 +11,9 @@ import os
 import pickle
 from grid_world import grid
 
+import gym 
+import d4rl
+
 FONT = ImageFont.truetype(
     os.path.join(os.path.dirname(__file__), "asset/fonts/arial.ttf"), 30
 )
@@ -632,6 +635,8 @@ class MiniWorldDataset(Dataset):
     def __init__(self, partition, stack_n=0):
         with open("world3d.pkl", "rb") as f:
             trajectories = pickle.load(f)
+        print("trajectories")
+        print(trajectories)
         reformatted_trajectories = []
         for states, actions in zip(trajectories["states"], trajectories["actions"]):
             states = list(zip(*states))[0]
@@ -692,3 +697,70 @@ def miniworld_loader(batch_size):
         dataset=test_dataset, batch_size=len(test_dataset), shuffle=False
     )
     return train_loader, test_loader
+
+
+# D4RL
+class D4RLDataset(Dataset):
+    def __init__(self, env_name, sample_traj = True, traj_length=50, num_traj=2000):
+        self.sample_traj = sample_traj
+        self.traj_length = traj_length
+        self.num_traj = num_traj
+        # load d4rl dataset
+        _, env_name = env_name.split('_', 1)
+        env = gym.make(env_name)
+        env.reset()
+        self.dataset = d4rl.qlearning_dataset(env)
+        if sample_traj:
+            # generate trajectory data
+            states = self.dataset['observations']
+            actions = self.dataset['actions']
+            next_states = self.dataset['next_observations']
+            trajectories = []
+            ind = 0
+            trajectory = []
+            for state, action, next_state in zip(states, actions, next_states):
+                trajectory.append([state, action, next_state])
+                if (ind+1)%traj_length == 0:
+                    trajectories.append(trajectory)
+                    trajectory = []
+                if len(trajectories) == num_traj:
+                    break
+                ind += 1
+            self.trajectories = trajectories
+            self.obs_size = states[0].shape[0]
+            self.action_size = actions[0].shape[0]
+        else:
+            length = self.dataset['observations'].shape[0]
+            self.states = self.dataset['observations']
+            self.actions = self.dataset['actions']
+            self.next_states = self.dataset['next_observations']
+            self.rewards = self.dataset['rewards']
+            self.random_states = self.dataset['observations'][np.random.choice(length, size=length, replace=False)]
+    
+    @property
+    def seq_size(self):
+        return self.traj_length - 2
+
+    def __len__(self):
+      if self.sample_traj:
+        return self.num_traj
+      else:
+        return self.states.shape[0]
+    
+    def __getitem__(self, index):
+        if self.sample_traj:
+            traj = self.trajectories[index]
+            states, actions, _ = zip(*traj)
+            return (np.stack(states).astype(np.float32), np.stack(actions))
+        else:
+            state = self.states[index]
+            action = self.actions[index]
+            next_state = self.next_states[index]
+            reward = self.rewards[index]
+            random_state = self.random_states[index]
+            return (state, action, next_state, reward, random_state)
+
+
+                
+
+

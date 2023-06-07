@@ -27,6 +27,13 @@ class Embedder(abc.ABC, nn.Module):
         """Returns the dimension of the output (int)."""
         return self._embed_dim
 
+class IdentityEmbedder(Embedder):
+    def __init__(self, embed_dim):
+        super().__init__(embed_dim)
+
+    def forward(self, input):
+        return nn.Identity()(input)
+
 
 class RecurrentStateEmbedder(Embedder):
     """Applies an LSTM on top of a state embedding."""

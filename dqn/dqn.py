@@ -9,7 +9,7 @@ import dqn_utils
 import schedule
 import replay
 import embed
-
+import gym
 from torch.nn import functional as F
 import tqdm
 from grid_world import grid
@@ -18,6 +18,7 @@ from world3d import world3d
 
 class DQNAgent(object):
     @classmethod
+    # This method create the agent, given the environment and the configuratioin dict
     def from_config(cls, config, env):
         dqn = DQNPolicy.from_config(config.get("policy"), env)
         replay_buffer = replay.ReplayBuffer.from_config(config.get("buffer"))
@@ -178,6 +179,8 @@ class DQNPolicy(nn.Module):
             elif isinstance(env.unwrapped, world3d.MultiTask3DEnv):
                 state_embedder = embed.World3DEmbedder(
                         embedder_config.get("embed_dim"))
+            elif isinstance(env, gym.wrappers.time_limit.TimeLimit):
+                state_embedder = embed.IdentityEmbedder(None)
             else:
                 raise ValueError()
 
@@ -216,6 +219,7 @@ class DQNPolicy(nn.Module):
             gamma (float): discount factor
         """
         super().__init__()
+        # TODO: modify this to accept continous actions
         self._Q = DuelingNetwork(num_actions, state_embedder_factory())
         self._target_Q = DuelingNetwork(num_actions, state_embedder_factory())
         self._num_actions = num_actions

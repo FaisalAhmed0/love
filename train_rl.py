@@ -188,7 +188,7 @@ def main():
     optimizer = Adam(params=model.parameters(), lr=args.learn_rate, amsgrad=True)
 
     # test data
-    pre_test_full_state_list, pre_test_full_action_list = iter(test_loader).next()
+    pre_test_full_state_list, pre_test_full_action_list =  next(iter(test_loader))
     pre_test_full_state_list = pre_test_full_state_list.to(device)
     pre_test_full_action_list = pre_test_full_action_list.to(device)
 
