@@ -24,43 +24,43 @@
     "hyperparam_list": [
       {
         "param": "args.name",
-        "values": "maze2d-open-v0"
+        "values":[ "maze2d-open-v0"]
       },
       {
         "param": "args.coding_len_coeff",
-        "values": 0.005
+        "values": [0.005]
       },
       {
         "param": "args.kl_coeff",
-        "values": 0.0
+        "values": [0.0]
       },
       {
         "param": "args.rec_coeff",
-        "values": 1.0
+        "values": [1.0]
       },
       {
         "param": "args.batch-size",
-        "values": 64
+        "values": [64]
       },
       {
         "param": "args.dataset-path",
-        "values": "d4rl"
+        "values": ["d4rl"]
       },
       {
         "param": "args.max-iters",
-        "values": 20000
+        "values": [20000]
       },
       {
         "param": "args.state-size",
-        "values": 8
+        "values": [8]
       },
       {
         "param": "args.use_min_length_boundary_mask",
-        "values": "use_min_length_boundary_mask"
+        "values": ["use_min_length_boundary_mask"]
       },
       {
         "param": "args.latent-n",
-        "values":10
+        "values":[10]
       }
     ]
   }
