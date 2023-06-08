@@ -239,29 +239,29 @@ def main(params=None):
     seq_size = train_loader.dataset.seq_size
 
     # init models
-    use_abs_pos_kl = args.use_abs_pos_kl == 1.0
+    use_abs_pos_kl = args["use_abs_pos_kl"] == 1.0
     model = EnvModel(
         action_encoder=action_encoder,
         encoder=encoder,
         decoder=decoder,
         belief_size=args["belief_size"],
-        state_size=args.state_size,
-        num_layers=args.num_layers,
-        max_seg_len=args.seg_len,
-        max_seg_num=args.seg_num,
-        latent_n=args.latent_n,
-        kl_coeff=args.kl_coeff,
-        rec_coeff=args.rec_coeff,
+        state_size=args["state_size"],
+        num_layers=args["num_layers"],
+        max_seg_len=args["seg_len"],
+        max_seg_num=args["seg_num"],
+        latent_n=args["latent_n"],
+        kl_coeff=args["kl_coeff"],
+        rec_coeff=args["rec_coeff"],
         use_abs_pos_kl=use_abs_pos_kl,
-        coding_len_coeff=args.coding_len_coeff,
-        use_min_length_boundary_mask=args.use_min_length_boundary_mask,
-        ddo=args.ddo,
+        coding_len_coeff=args["coding_len_coeff"],
+        use_min_length_boundary_mask=args["use_min_length_boundary_mask"],
+        ddo=args["ddo"],
         output_normal=output_normal
     ).to(device)
     LOGGER.info("Model initialized")
 
     # init optimizer
-    optimizer = Adam(params=model.parameters(), lr=args.learn_rate, amsgrad=True)
+    optimizer = Adam(params=model.parameters(), lr=args["learn_rate"], amsgrad=True)
 
     # test data
     pre_test_full_state_list, pre_test_full_action_list =  next(iter(test_loader))
@@ -271,17 +271,17 @@ def main(params=None):
     # for each iter
     torch.autograd.set_detect_anomaly(False)
     b_idx = 0
-    while b_idx <= args.max_iters:
+    while b_idx <= args["max_iters"]:
         # for each batch
         for train_obs_list, train_action_list in train_loader:
             b_idx += 1
             # mask temp annealing
-            if args.beta_anneal:
+            if args["beta_anneal"]:
                 model.state_model.mask_beta = (
-                    args.max_beta - args.min_beta
-                ) * 0.999 ** (b_idx / args.beta_anneal) + args.min_beta
+                    args["max_beta"] - args["min_beta"]
+                ) * 0.999 ** (b_idx / args["beta_anneal"]) + args["beta_anneal"]
             else:
-                model.state_model.mask_beta = args.max_beta
+                model.state_model.mask_beta = args["max_beta"]
 
             ##############
             # train time #
@@ -293,10 +293,10 @@ def main(params=None):
             model.train()
             optimizer.zero_grad()
             results = model(
-                train_obs_list, train_action_list, seq_size, init_size, args.obs_std
+                train_obs_list, train_action_list, seq_size, init_size, args["obs_std"]
             )
 
-            if args.coding_len_coeff > 0:
+            if args["coding_len_coeff"] > 0:
                 if results["obs_cost"].mean() < 0.02:
                     model.coding_len_coeff += 0.00002
                 elif b_idx > 0:
@@ -309,9 +309,9 @@ def main(params=None):
             # get train loss and backward update
             train_total_loss = results["train_loss"]
             train_total_loss.backward()
-            if args.grad_clip > 0.0:
+            if args["grad_clip"] > 0.0:
                 grad_norm = nn.utils.clip_grad_norm_(
-                    model.parameters(), args.grad_clip, error_if_nonfinite=True)
+                    model.parameters(), args["grad_clip"], error_if_nonfinite=True)
             optimizer.step()
 
             # log
@@ -496,7 +496,7 @@ def main(params=None):
                         pre_test_full_action_list,
                         seq_size,
                         init_size,
-                        args.obs_std,
+                        args["obs_std"],
                     )
 
                     # log
