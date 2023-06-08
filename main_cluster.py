@@ -2,7 +2,7 @@ import os
 import time
 
 import numpy as np
-from train_rl import Runner
+from train_rl import main
 from cluster import exit_for_resume, read_params_from_cmdline, save_metrics_params
 
 
@@ -14,11 +14,7 @@ if __name__ == "__main__":
     
 
     params = read_params_from_cmdline()
-    print("params")
-    print(params)
-    print(type(params))
-    runner = Runner(params)
-    runner.main_f()
+    main(params)
     # simulate that the jobs take some time
     max_sleep_time = params.get("max_sleep_time", 10)
     time.sleep(np.random.randint(0, max_sleep_time))
