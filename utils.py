@@ -593,7 +593,7 @@ class ComPILEDataset(Dataset):
     def __init__(self, partition):
         import sys
         sys.path.append('grid_world')
-        trajectories = np.load("compile.npy", allow_pickle=True)
+        trajectories = np.load("../compile.npy", allow_pickle=True)
         self.partition = partition
         num_heldout = 100
         if self.partition == "train":
