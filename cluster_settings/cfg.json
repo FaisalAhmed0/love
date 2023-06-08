@@ -64,7 +64,7 @@
       },
       {
         "param": "action_type",
-        "values": "d"
+        "values": ["d"]
       }
     ]
   }
