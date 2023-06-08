@@ -186,7 +186,6 @@ def main(params=None):
     LOGGER.info("EXP NAME: " + exp_name)
     LOGGER.info(">" * 80)
     LOGGER.info(args)
-    print("This is passed at info")
     LOGGER.info(">" * 80)
 
     # load dataset
@@ -277,7 +276,6 @@ def main(params=None):
     while b_idx <= args["max_iters"]:
         # for each batch
         for train_obs_list, train_action_list in train_loader:
-            print("In the training loop")
             b_idx += 1
             # mask temp annealing
             if args["beta_anneal"]:
@@ -320,8 +318,6 @@ def main(params=None):
 
             # log
             if b_idx % 5 == 0:
-                print(b_idx)
-                print(os.path.abspath(os.curdir))
                 results["grad_norm"] = grad_norm
                 train_stats, log_str, log_data = utils.log_train(results, None, b_idx)
                 if not "d4rl" in params["dataset_path"]:
@@ -346,13 +342,8 @@ def main(params=None):
             torch.set_printoptions(threshold=100000)
             
             if b_idx % 200 == 0:
-                print("after 200 steps")
-                print(b_idx)
-                print(os.path.abspath(os.curdir))
-                quit()
                 exp_dir = os.path.join("experiments", args["name"], str(b_idx))
                 os.makedirs(exp_dir, exist_ok=True)
-                print(f"exp_dir, : {exp_dir}")
                 for batch_idx in range(min(train_obs_list.shape[0], 10)):
                     states = train_obs_list[batch_idx][init_size:-init_size]
                     actions = train_action_list[batch_idx][init_size:-init_size]
