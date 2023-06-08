@@ -234,7 +234,8 @@ def main(params=None):
         output_normal = True
 
     else:
-        raise ValueError(f"Unrecognize dataset_path {args["dataset_path"]}")
+        path = args["dataset_path"]
+        raise ValueError(f"Unrecognize dataset_path {path}")
 
     seq_size = train_loader.dataset.seq_size
 
