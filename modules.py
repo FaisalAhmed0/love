@@ -393,6 +393,20 @@ class StateDependentEncoder(Encoder):
         return out.reshape(shape[:2] + [-1])
 
 
+class D4RlEncoder(nn.Module):
+    def __init__(self, input_dim=4, output_dim=128, feat_size=64):
+        """Embedder for states in D4RL environment."""
+        super().__init__()
+        self.model = nn.Sequential(
+            nn.Linear(input_dim, feat_size),  nn.ReLU(),
+            nn.Linear(feat_size, output_dim),  
+        )
+
+    def forward(self, inpt):
+        return self.model(inpt)
+
+    
+
 class CompILEGridEncoder(nn.Module):
     """Embedder for states in CompILE environment."""
 

@@ -140,28 +140,24 @@ def date_str():
 
 
 def set_exp_name(args):
-    exp_name = args.name + "_" + date_str()
+    exp_name = args["name"] + "_" + date_str()
     return exp_name
 
 def main(params=None):
     # parse arguments
-    print(f"The start of the main1")
     args = parse_args()
-    print(f"The start of the main2")
     cmd_args = params
-    print(f"The start of the main3")
     if cmd_args:
         for key in cmd_args:
             args[key] = cmd_args[key]
-    print(f"The start of the main4")
+    
     if not args["wandb"]:
         os.environ["WANDB_MODE"] = "offline"
-    print(f"Main have been called and finished")
-    quit()
+    
     # fix seed
-    np.random.seed(args.seed)
-    torch.manual_seed(args.seed)
-    torch.cuda.manual_seed_all(args.seed)
+    np.random.seed(args["seed"])
+    torch.manual_seed(args["seed"])
+    torch.cuda.manual_seed_all(args["seed"])
     torch.backends.cudnn.deterministic = True
 
     # set logger
@@ -169,7 +165,7 @@ def main(params=None):
     logging.basicConfig(level=logging.INFO, format=log_format, stream=sys.stderr)
 
     # set size
-    init_size = args.init_size
+    init_size = args["init_size"]
 
     # set device as gpu
     device = torch.device("cuda", 0)
@@ -189,52 +185,56 @@ def main(params=None):
     LOGGER.info("EXP NAME: " + exp_name)
     LOGGER.info(">" * 80)
     LOGGER.info(args)
+    print("This is passed at info")
     LOGGER.info(">" * 80)
 
     # load dataset
-    if "compile" in args.dataset_path:
-        train_loader, test_loader = utils.compile_loader(args.batch_size)
+    if "compile" in args["dataset_path"]:
+        train_loader, test_loader = utils.compile_loader(args["batch_size"])
+        # action encdoer given the trajectory
         action_encoder = GridActionEncoder(
             action_size=train_loader.dataset.action_size,
-            embedding_size=args.belief_size,
+            embedding_size=args["belief_size"],
         )
-        encoder = modules.CompILEGridEncoder(feat_size=args.belief_size)
+        # observation encdoer given the trajectory
+        encoder = modules.CompILEGridEncoder(feat_size=args["belief_size"])
+        # observation decoder for recounstructing the observation given the state abstraction
         decoder = GridDecoder(
-            input_size=args.belief_size,
+            input_size=args["belief_size"],
             action_size=train_loader.dataset.action_size,
-            feat_size=args.belief_size,
+            feat_size=args["belief_size"],
         )
         output_normal = True
-    elif "miniworld" in args.dataset_path:
-        train_loader, test_loader = utils.miniworld_loader(args.batch_size)
+    elif "miniworld" in args["dataset_path"]:
+        train_loader, test_loader = utils.miniworld_loader(args["batch_size"])
         action_encoder = GridActionEncoder(
             action_size=train_loader.dataset.action_size,
-            embedding_size=args.belief_size,
+            embedding_size=args["belief_size"],
         )
         encoder = modules.MiniWorldEncoderPano(input_dim=3)
         decoder = GridDecoder(
-            input_size=args.belief_size,
+            input_size=args["belief_size"],
             action_size=train_loader.dataset.action_size,
-            feat_size=args.belief_size,
+            feat_size=args["belief_size"],
         )
         output_normal = False
     
-    elif "d4rl" in args.dataset_path:
-        train_loader, test_loader = utils.d4rl_loader(args.batch_size, args.name)
+    elif "d4rl" in args["dataset_path"]:
+        train_loader, test_loader = utils.d4rl_loader(args["batch_size"], args["name"])
         action_encoder = GridActionEncoder(
             action_size=train_loader.dataset.action_size,
-            embedding_size=args.belief_size,
+            embedding_size=args["belief_size"],
         )
-        encoder = modules.MiniWorldEncoderPano(input_dim=3)
+        encoder = modules.D4RlEncoder()
         decoder = GridDecoder(
-            input_size=args.belief_size,
+            input_size=args["belief_size"],
             action_size=train_loader.dataset.action_size,
-            feat_size=args.belief_size,
+            feat_size=args["belief_size"],
         )
         output_normal = True
 
     else:
-        raise ValueError(f"Unrecognize dataset_path {args.dataset_path}")
+        raise ValueError(f"Unrecognize dataset_path {args["dataset_path"]}")
 
     seq_size = train_loader.dataset.seq_size
 
@@ -244,7 +244,7 @@ def main(params=None):
         action_encoder=action_encoder,
         encoder=encoder,
         decoder=decoder,
-        belief_size=args.belief_size,
+        belief_size=args["belief_size"],
         state_size=args.state_size,
         num_layers=args.num_layers,
         max_seg_len=args.seg_len,
@@ -338,7 +338,7 @@ def main(params=None):
             np.set_printoptions(threshold=100000)
             torch.set_printoptions(threshold=100000)
             if b_idx % 200 == 0:
-                exp_dir = os.path.join("experiments", args.name, str(b_idx))
+                exp_dir = os.path.join("experiments", args["name"], str(b_idx))
                 os.makedirs(exp_dir, exist_ok=True)
                 for batch_idx in range(min(train_obs_list.shape[0], 10)):
                     states = train_obs_list[batch_idx][init_size:-init_size]
@@ -357,7 +357,7 @@ def main(params=None):
                             curr_option = options[seq_idx]
 
                         # panorama observation for miniworld
-                        if args.dataset_path == "miniworld":
+                        if args["dataset_path"] == "miniworld":
                             ################################################
                             #  Begin of miniworld specific
                             ################################################
@@ -386,7 +386,7 @@ def main(params=None):
                             ################################################
                             #  End of miniworld specific
                             ################################################
-                        elif args.dataset_path == "compile":
+                        elif args["dataset_path"] == "compile":
                             ################################################
                             #  Begin of compile specific
                             ################################################
@@ -477,7 +477,7 @@ def main(params=None):
                 LOGGER.info("#" * 80)
 
             if b_idx % 2000 == 0:
-                exp_dir = os.path.join("experiments", args.name)
+                exp_dir = os.path.join("experiments", args["name"])
                 torch.save(
                     model.state_model, os.path.join(exp_dir, f"model-{b_idx}.ckpt")
                 )
