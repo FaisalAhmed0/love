@@ -220,7 +220,7 @@ def main(params=None):
     
     elif "d4rl" in args["dataset_path"]:
         train_loader, test_loader = utils.d4rl_loader(args["batch_size"], args["name"])
-        action_encoder = GridActionEncoder(
+        action_encoder = modules.D4RLActionEncoder(
             action_size=train_loader.dataset.action_size,
             embedding_size=args["belief_size"],
         )
