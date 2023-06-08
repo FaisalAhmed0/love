@@ -318,7 +318,7 @@ def main(params=None):
             if b_idx % 5 == 0:
                 results["grad_norm"] = grad_norm
                 train_stats, log_str, log_data = utils.log_train(results, None, b_idx)
-                if not "d4rl" in params["data_path"]:
+                if not "d4rl" in params["dataset_path"]:
                     # Boundaries for grid world
                     true_boundaries = train_action_list[:, init_size:-init_size] == 4
                     true_boundaries = torch.roll(true_boundaries, 1, -1)
