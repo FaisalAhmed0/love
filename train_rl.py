@@ -145,14 +145,16 @@ def set_exp_name(args):
 
 def main(params=None):
     # parse arguments
-    print(f"The start of the main")
+    print(f"The start of the main1")
     args = parse_args()
+    print(f"The start of the main2")
     cmd_args = params
+    print(f"The start of the main3")
     if cmd_args:
         for key in cmd_args:
             args[key] = cmd_args[key]
-
-    if not args.wandb:
+    print(f"The start of the main4")
+    if not args["wandb"]:
         os.environ["WANDB_MODE"] = "offline"
     print(f"Main have been called and finished")
     quit()
