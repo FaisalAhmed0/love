@@ -730,7 +730,7 @@ class D4RLDataset(Dataset):
             if self.partition:
                 self.trajectories = trajectories[:holdout]
             else:
-                self.trajectories = trajectories
+                self.trajectories = trajectories[holdout:]
             self.obs_size = states[0].shape[0]
             self.action_size = actions[0].shape[0]
         else:
@@ -747,11 +747,13 @@ class D4RLDataset(Dataset):
 
     def __len__(self):
       if self.sample_traj:
-        return self.num_traj
+        return len(self.trajectories)
       else:
         return self.states.shape[0]
     
     def __getitem__(self, index):
+        print(f"index:{index}")
+        print(f"len(self.trajectories[index]): {len(self.trajectories[index])}")
         if self.sample_traj:
             traj = self.trajectories[index]
             states, actions, _ = zip(*traj)
