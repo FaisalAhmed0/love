@@ -17,12 +17,15 @@ class HierarchicalStateSpaceModel(nn.Module):
         latent_n=10,
         use_min_length_boundary_mask=False,
         ddo=False,
-        output_normal=True
+        output_normal=True,
+        action_type = "d"
     ):
         super(HierarchicalStateSpaceModel, self).__init__()
         ################
         # network size #
         ################
+        # action type, discerete or continous ?
+        self.action_type = action_type
         # abstract level
         self.abs_belief_size = belief_size
         self.abs_state_size = belief_size
@@ -713,7 +716,11 @@ class HierarchicalStateSpaceModel(nn.Module):
 
         dummy_obs_belief = torch.zeros(abs_feat.shape[0], device=abs_feat.device)
         obs_feat = self.obs_feat(torch.cat((dummy_obs_belief, obs_state), 0))
-        return torch.argmax(self.dec_obs(obs_feat)).item(), hidden_state
+        if self.action_type == "d":
+            action = torch.argmax(self.dec_obs(obs_feat)).item()
+        else:
+            action = self.dec_obs(obs_feat)
+        return action, hidden_state
 
 
 class EnvModel(nn.Module):
@@ -773,7 +780,8 @@ class EnvModel(nn.Module):
             latent_n=self.latent_n,
             use_min_length_boundary_mask=use_min_length_boundary_mask,
             ddo=ddo,
-            output_normal=output_normal
+            output_normal=output_normal,
+            action_type = action_type
         )
         self._output_normal = output_normal
         self.action_type = action_type
