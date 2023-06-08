@@ -351,7 +351,7 @@ def main(params=None):
                     boundaries = results["mask_data"][batch_idx]
                     frames = []
                     curr_option = options[0]
-                    if not "d4rl" in params["data_path"]:
+                    if not "d4rl" in params["dataset_path"]:
                         for seq_idx in range(states.shape[0]):
                             # read new option if boundary is 1
                             if boundaries[seq_idx].item() == 1:
