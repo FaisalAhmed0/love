@@ -277,6 +277,8 @@ def main(params=None):
     while b_idx <= args["max_iters"]:
         # for each batch
         for train_obs_list, train_action_list in train_loader:
+            print("In the training loop")
+            quit()
             b_idx += 1
             # mask temp annealing
             if args["beta_anneal"]:
@@ -341,7 +343,7 @@ def main(params=None):
 
             np.set_printoptions(threshold=100000)
             torch.set_printoptions(threshold=100000)
-            print(f"b_idx, : {b_idx}")
+            
             if b_idx % 200 == 0:
                 exp_dir = os.path.join("experiments", args["name"], str(b_idx))
                 os.makedirs(exp_dir, exist_ok=True)
