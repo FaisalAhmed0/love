@@ -621,7 +621,9 @@ class D4RLActionEncoder(nn.Module):
         super().__init__()
         self.action_size = action_size
         self.embedding_size = embedding_size
-        self._embedder = nn.Identity()
+        self._embedder = nn.Linear(
+            action_size, embedding_size
+        )
 
     def forward(self, x):
         return self._embedder(x)
