@@ -278,7 +278,6 @@ def main(params=None):
         # for each batch
         for train_obs_list, train_action_list in train_loader:
             print("In the training loop")
-            quit()
             b_idx += 1
             # mask temp annealing
             if args["beta_anneal"]:
@@ -321,6 +320,8 @@ def main(params=None):
 
             # log
             if b_idx % 5 == 0:
+                print(b_idx)
+                quit()
                 results["grad_norm"] = grad_norm
                 train_stats, log_str, log_data = utils.log_train(results, None, b_idx)
                 if not "d4rl" in params["dataset_path"]:
