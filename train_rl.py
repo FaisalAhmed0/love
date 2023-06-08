@@ -175,8 +175,7 @@ def main(params=None):
     exp_name = set_exp_name(args)
 
     wandb.init(
-        project="mdl",
-        entity="ydjiang",
+        project="love",
         name=exp_name,
         sync_tensorboard=False,
         settings=wandb.Settings(start_method="fork"),
