@@ -79,7 +79,7 @@ def parse_args():
         
 
         # baselines
-        "ddo": True,
+        "ddo": False,
     }
     return defualt_params
     # parser = argparse.ArgumentParser(description="vta agr parser")
