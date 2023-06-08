@@ -145,6 +145,7 @@ def set_exp_name(args):
 
 def main(params=None):
     # parse arguments
+    print(f"The start of the main")
     args = parse_args()
     cmd_args = params
     if cmd_args:
@@ -153,7 +154,7 @@ def main(params=None):
 
     if not args.wandb:
         os.environ["WANDB_MODE"] = "offline"
-    print(f"Main have been called")
+    print(f"Main have been called and finished")
     quit()
     # fix seed
     np.random.seed(args.seed)
