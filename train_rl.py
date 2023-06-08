@@ -76,6 +76,8 @@ def parse_args():
         "use_abs_pos_kl": 0,
         "coding_len_coeff": 1.0,
         "use_min_length_boundary_mask": True,
+
+        "action_type": "d", # d for discrete, c for continuous
         
 
         # baselines
@@ -256,7 +258,8 @@ def main(params=None):
         coding_len_coeff=args["coding_len_coeff"],
         use_min_length_boundary_mask=args["use_min_length_boundary_mask"],
         ddo=args["ddo"],
-        output_normal=output_normal
+        output_normal=output_normal, 
+        action_type = args["action_type"]
     ).to(device)
     LOGGER.info("Model initialized")
 

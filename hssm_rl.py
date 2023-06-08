@@ -734,7 +734,8 @@ class EnvModel(nn.Module):
         coding_len_coeff=10.0,
         use_min_length_boundary_mask=False,
         ddo=False,
-        output_normal=True
+        output_normal=True,
+        action_type = "d"
     ):
         super(EnvModel, self).__init__()
         ################
@@ -775,6 +776,7 @@ class EnvModel(nn.Module):
             output_normal=output_normal
         )
         self._output_normal = output_normal
+        self.action_type = action_type
 
     def forward(self, obs_data_list, action_list, seq_size, init_size, obs_std=1.0):
         ############################
@@ -803,15 +805,16 @@ class EnvModel(nn.Module):
 
         # TODO: Add a boolean for continous actions
 
-        # obs_cost = F.cross_entropy(
-        #     obs_rec_list.reshape(-1, obs_rec_list.shape[-1]),
-        #     action_list[:, init_size:-init_size].reshape(-1),
-        # )
-        
-        obs_cost = F.mse_loss(
-            obs_rec_list.reshape(-1, obs_rec_list.shape[-1]),
-            action_list[:, init_size:-init_size].reshape(-1, action_list.shape[-1]),
-        )
+        if self.action_type == "d":
+            obs_cost = F.cross_entropy(
+                obs_rec_list.reshape(-1, obs_rec_list.shape[-1]),
+                action_list[:, init_size:-init_size].reshape(-1),
+            )
+        else:
+            obs_cost = F.mse_loss(
+                obs_rec_list.reshape(-1, obs_rec_list.shape[-1]),
+                action_list[:, init_size:-init_size].reshape(-1, action_list.shape[-1]),
+            )
 
         #######################
         # (3) compute kl_cost #
