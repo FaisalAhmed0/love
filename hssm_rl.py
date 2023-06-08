@@ -803,15 +803,15 @@ class EnvModel(nn.Module):
 
         # TODO: Add a boolean for continous actions
 
-        obs_cost = F.cross_entropy(
-            obs_rec_list.reshape(-1, obs_rec_list.shape[-1]),
-            action_list[:, init_size:-init_size].reshape(-1),
-        )
-        
-        # obs_cost = F.mse_loss(
+        # obs_cost = F.cross_entropy(
         #     obs_rec_list.reshape(-1, obs_rec_list.shape[-1]),
-        #     action_list[:, init_size:-init_size].reshape(-1, action_list.shape[-1]),
+        #     action_list[:, init_size:-init_size].reshape(-1),
         # )
+        
+        obs_cost = F.mse_loss(
+            obs_rec_list.reshape(-1, obs_rec_list.shape[-1]),
+            action_list[:, init_size:-init_size].reshape(-1, action_list.shape[-1]),
+        )
 
         #######################
         # (3) compute kl_cost #

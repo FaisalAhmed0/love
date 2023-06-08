@@ -635,8 +635,6 @@ class MiniWorldDataset(Dataset):
     def __init__(self, partition, stack_n=0):
         with open("world3d.pkl", "rb") as f:
             trajectories = pickle.load(f)
-        print("trajectories")
-        print(trajectories)
         reformatted_trajectories = []
         for states, actions in zip(trajectories["states"], trajectories["actions"]):
             states = list(zip(*states))[0]
