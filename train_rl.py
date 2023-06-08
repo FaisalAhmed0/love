@@ -318,21 +318,22 @@ def main(params=None):
             if b_idx % 5 == 0:
                 results["grad_norm"] = grad_norm
                 train_stats, log_str, log_data = utils.log_train(results, None, b_idx)
-                # Boundaries for grid world
-                true_boundaries = train_action_list[:, init_size:-init_size] == 4
-                true_boundaries = torch.roll(true_boundaries, 1, -1)
-                true_boundaries[:, 0] = True
-                correct_boundaries = torch.logical_and(
-                    results["mask_data"].squeeze(-1) == true_boundaries, true_boundaries
-                ).sum()
-                num_pred_boundaries = results["mask_data"].sum()
-                num_true_boundaries = true_boundaries.sum()
-                train_stats["train/precision"] = (
-                    correct_boundaries / num_pred_boundaries
-                )
-                train_stats["train/recall"] = correct_boundaries / num_true_boundaries
+                if not "d4rl" in params["data_path"]:
+                    # Boundaries for grid world
+                    true_boundaries = train_action_list[:, init_size:-init_size] == 4
+                    true_boundaries = torch.roll(true_boundaries, 1, -1)
+                    true_boundaries[:, 0] = True
+                    correct_boundaries = torch.logical_and(
+                        results["mask_data"].squeeze(-1) == true_boundaries, true_boundaries
+                    ).sum()
+                    num_pred_boundaries = results["mask_data"].sum()
+                    num_true_boundaries = true_boundaries.sum()
+                    train_stats["train/precision"] = (
+                        correct_boundaries / num_pred_boundaries
+                    )
+                    train_stats["train/recall"] = correct_boundaries / num_true_boundaries
 
-                LOGGER.info(log_str, *log_data)
+                    LOGGER.info(log_str, *log_data)
                 wandb.log(train_stats, step=b_idx)
 
             np.set_printoptions(threshold=100000)
@@ -350,109 +351,109 @@ def main(params=None):
                     boundaries = results["mask_data"][batch_idx]
                     frames = []
                     curr_option = options[0]
+                    if not "d4rl" in params["data_path"]:
+                        for seq_idx in range(states.shape[0]):
+                            # read new option if boundary is 1
+                            if boundaries[seq_idx].item() == 1:
+                                curr_option = options[seq_idx]
 
-                    for seq_idx in range(states.shape[0]):
-                        # read new option if boundary is 1
-                        if boundaries[seq_idx].item() == 1:
-                            curr_option = options[seq_idx]
+                            # panorama observation for miniworld
+                            if args["dataset_path"] == "miniworld":
+                                ################################################
+                                #  Begin of miniworld specific
+                                ################################################
+                                f = []
+                                for i in range(5):
+                                    f.append(states[seq_idx][:, :, i * 3 : (i + 1) * 3])
+                                frame = torch.cat(f[::-1], axis=1)
+                                frame = world3d.Render(frame.cpu().data.numpy())
+                                frame.write_text(
+                                    f"Action: {repr(miniworld.MiniWorldEnv.Actions(actions[seq_idx].item()))}")
+                                frame.write_text(
+                                    f"Reconstructed: {repr(miniworld.MiniWorldEnv.Actions(reconstructed_actions[seq_idx].item()))}")
+                                if (
+                                    actions[seq_idx].item()
+                                    == reconstructed_actions[seq_idx].item()
+                                ):
+                                    frame.write_text("CORRECT")
+                                else:
+                                    frame.write_text("WRONG")
 
-                        # panorama observation for miniworld
-                        if args["dataset_path"] == "miniworld":
-                            ################################################
-                            #  Begin of miniworld specific
-                            ################################################
-                            f = []
-                            for i in range(5):
-                                f.append(states[seq_idx][:, :, i * 3 : (i + 1) * 3])
-                            frame = torch.cat(f[::-1], axis=1)
-                            frame = world3d.Render(frame.cpu().data.numpy())
-                            frame.write_text(
-                                f"Action: {repr(miniworld.MiniWorldEnv.Actions(actions[seq_idx].item()))}")
-                            frame.write_text(
-                                f"Reconstructed: {repr(miniworld.MiniWorldEnv.Actions(reconstructed_actions[seq_idx].item()))}")
-                            if (
-                                actions[seq_idx].item()
-                                == reconstructed_actions[seq_idx].item()
-                            ):
-                                frame.write_text("CORRECT")
-                            else:
-                                frame.write_text("WRONG")
+                                if actions[seq_idx].item() == miniworld.MiniWorldEnv.Actions.pickup:
+                                    frame.write_text("PICKUP")
+                                else:
+                                    frame.write_text("NOT PICKUP")
 
-                            if actions[seq_idx].item() == miniworld.MiniWorldEnv.Actions.pickup:
-                                frame.write_text("PICKUP")
-                            else:
-                                frame.write_text("NOT PICKUP")
-
-                            ################################################
-                            #  End of miniworld specific
-                            ################################################
-                        elif args["dataset_path"] == "compile":
-                            ################################################
-                            #  Begin of compile specific
-                            ################################################
-                            frame = grid.GridRender(10, 10)
-                            # this double for loop is for visualization
-                            for x in range(10):
-                                for y in range(10):
-                                    obj = np.argmax(
-                                        states[seq_idx][x][y].cpu().data.numpy()
-                                    )
-                                    if (
-                                        obj == grid.ComPILEObject.num_types()
-                                        or states[seq_idx][x][y][
-                                            grid.ComPILEObject.num_types()
-                                        ]
-                                    ):
-                                        frame.draw_rectangle(
-                                            np.array((x, y)), 0.9, "cyan"
+                                ################################################
+                                #  End of miniworld specific
+                                ################################################
+                            elif args["dataset_path"] == "compile":
+                                ################################################
+                                #  Begin of compile specific
+                                ################################################
+                                frame = grid.GridRender(10, 10)
+                                # this double for loop is for visualization
+                                for x in range(10):
+                                    for y in range(10):
+                                        obj = np.argmax(
+                                            states[seq_idx][x][y].cpu().data.numpy()
                                         )
-                                    elif obj == grid.ComPILEObject.num_types() + 1:
-                                        frame.draw_rectangle(
-                                            np.array((x, y)), 0.7, "black"
-                                        )
-                                    elif states[seq_idx][x][y][obj] == 1:
-                                        frame.draw_rectangle(
-                                            np.array((x, y)),
-                                            0.4,
-                                            grid.ComPILEObject.COLORS[obj],
-                                        )
+                                        if (
+                                            obj == grid.ComPILEObject.num_types()
+                                            or states[seq_idx][x][y][
+                                                grid.ComPILEObject.num_types()
+                                            ]
+                                        ):
+                                            frame.draw_rectangle(
+                                                np.array((x, y)), 0.9, "cyan"
+                                            )
+                                        elif obj == grid.ComPILEObject.num_types() + 1:
+                                            frame.draw_rectangle(
+                                                np.array((x, y)), 0.7, "black"
+                                            )
+                                        elif states[seq_idx][x][y][obj] == 1:
+                                            frame.draw_rectangle(
+                                                np.array((x, y)),
+                                                0.4,
+                                                grid.ComPILEObject.COLORS[obj],
+                                            )
+                                frame.write_text(
+                                    f"Action: {repr(grid.Action(actions[seq_idx].item()))}"
+                                )
+                                frame.write_text(
+                                    f"Reconstructed: {repr(grid.Action(reconstructed_actions[seq_idx].item()))}"
+                                )
+                                if (
+                                    actions[seq_idx].item()
+                                    == reconstructed_actions[seq_idx].item()
+                                ):
+                                    frame.write_text("CORRECT")
+                                else:
+                                    frame.write_text("WRONG")
+                                ################################################
+                                #  End of compile specific
+                                ################################################
+                            frame.write_text(f"Option: {curr_option}")
+                            frame.write_text(f"Boundary: {boundaries[seq_idx].item()}")
+                            frame.write_text(f"Obs NLL: {results['obs_cost'].mean()}")
                             frame.write_text(
-                                f"Action: {repr(grid.Action(actions[seq_idx].item()))}"
+                                f"Coding length: {results['encoding_length'].item()}"
                             )
                             frame.write_text(
-                                f"Reconstructed: {repr(grid.Action(reconstructed_actions[seq_idx].item()))}"
+                                f"Num reads: {results['mask_data'].sum(1).mean().item()}"
                             )
-                            if (
-                                actions[seq_idx].item()
-                                == reconstructed_actions[seq_idx].item()
-                            ):
-                                frame.write_text("CORRECT")
-                            else:
-                                frame.write_text("WRONG")
-                            ################################################
-                            #  End of compile specific
-                            ################################################
-                        frame.write_text(f"Option: {curr_option}")
-                        frame.write_text(f"Boundary: {boundaries[seq_idx].item()}")
-                        frame.write_text(f"Obs NLL: {results['obs_cost'].mean()}")
-                        frame.write_text(
-                            f"Coding length: {results['encoding_length'].item()}"
-                        )
-                        frame.write_text(
-                            f"Num reads: {results['mask_data'].sum(1).mean().item()}"
-                        )
-                        frames.append(frame.image())
+                            frames.append(frame.image())
 
-                    save_path = os.path.join(exp_dir, f"{batch_idx}.gif")
-                    frames[0].save(
-                        save_path,
-                        save_all=True,
-                        append_images=frames[1:],
-                        duration=750,
-                        loop=0,
-                        optimize=True,
-                        quality=20,
-                    )
+                        save_path = os.path.join(exp_dir, f"{batch_idx}.gif")
+                        frames[0].save(
+                            save_path,
+                            save_all=True,
+                            append_images=frames[1:],
+                            duration=750,
+                            loop=0,
+                            optimize=True,
+                            quality=20,
+                        )
 
             if b_idx % 100 == 0:
                 LOGGER.info("#" * 80)

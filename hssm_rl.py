@@ -807,9 +807,7 @@ class EnvModel(nn.Module):
         #     obs_rec_list.reshape(-1, obs_rec_list.shape[-1]),
         #     action_list[:, init_size:-init_size].reshape(-1),
         # )
-        print(f"obs_rec_list: {obs_rec_list.shape}")
-        print(f"action_list: {action_list.shape}")
-        print(f"action_list[:, init_size:-init_size]:{action_list[:, init_size:-init_size].shape}")
+        
         obs_cost = F.mse_loss(
             obs_rec_list.reshape(-1, obs_rec_list.shape[-1]),
             action_list[:, init_size:-init_size].reshape(-1, action_list.shape[-1]),
