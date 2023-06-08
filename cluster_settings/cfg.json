@@ -44,7 +44,7 @@
       },
       {
         "param": "dataset_path",
-        "values": ["../compile"]
+        "values": ["compile"]
       },
       {
         "param": "max_iters",
