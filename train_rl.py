@@ -321,7 +321,7 @@ def main(params=None):
             # log
             if b_idx % 5 == 0:
                 print(b_idx)
-                print(os.curdir)
+                print(os.path.abspath(os.curdir))
                 results["grad_norm"] = grad_norm
                 train_stats, log_str, log_data = utils.log_train(results, None, b_idx)
                 if not "d4rl" in params["dataset_path"]:
@@ -348,7 +348,8 @@ def main(params=None):
             if b_idx % 200 == 0:
                 print("after 200 steps")
                 print(b_idx)
-                print(os.curdir)
+                print(os.path.abspath(os.curdir))
+                quit()
                 exp_dir = os.path.join("experiments", args["name"], str(b_idx))
                 os.makedirs(exp_dir, exist_ok=True)
                 print(f"exp_dir, : {exp_dir}")
