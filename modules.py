@@ -614,6 +614,18 @@ class MiniWorldEncoderPano(nn.Module):
         return obs
 
 
+class D4RLActionEncoder(nn.Module):
+    """Embedder for discrete actions."""
+
+    def __init__(self, action_size, embedding_size):
+        super().__init__()
+        self.action_size = action_size
+        self.embedding_size = embedding_size
+        self._embedder = nn.Identity()
+
+    def forward(self, x):
+        return self._embedder(x)
+
 class GridActionEncoder(nn.Module):
     """Embedder for discrete actions."""
 

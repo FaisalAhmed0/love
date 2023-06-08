@@ -753,7 +753,7 @@ class D4RLDataset(Dataset):
     
     def __getitem__(self, index):
         print(f"index:{index}")
-        print(f"len(self.trajectories[index]): {len(self.trajectories[index])}")
+        print(f"len(self.trajectories[index]): {len(self.trajectories)}")
         if self.sample_traj:
             traj = self.trajectories[index]
             states, actions, _ = zip(*traj)
