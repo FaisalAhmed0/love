@@ -24,7 +24,7 @@
     "hyperparam_list": [
       {
         "param": "name",
-        "values": ["grid_world_love"]
+        "values":[ "maze2d-open-v0"]
       },
       {
         "param": "coding_len_coeff",
@@ -44,7 +44,7 @@
       },
       {
         "param": "dataset_path",
-        "values": ["../compile"]
+        "values": ["../d4rl"]
       },
       {
         "param": "max_iters",
