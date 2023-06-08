@@ -39,19 +39,19 @@
         "values": [1.0]
       },
       {
-        "param": "batch-size",
+        "param": "batch_size",
         "values": [64]
       },
       {
-        "param": "dataset-path",
+        "param": "dataset_path",
         "values": ["d4rl"]
       },
       {
-        "param": "max-iters",
+        "param": "max_iters",
         "values": [20000]
       },
       {
-        "param": "state-size",
+        "param": "state_size",
         "values": [8]
       },
       {
@@ -59,7 +59,7 @@
         "values": ["use_min_length_boundary_mask"]
       },
       {
-        "param": "latent-n",
+        "param": "latent_n",
         "values":[10]
       }
     ]

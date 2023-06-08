@@ -38,37 +38,37 @@ def parse_args():
         "name" : "st",
 
         # data size
-        "dataset-path":"./data/demos",
-        "batch-size": 128,
+        "dataset_path":"./data/demos",
+        "batch_size": 128,
         "seq-size" : 6,
-        "init-size":1,
+        "init_size":1,
 
         # model size
-        "state-size": 8,
-        "belief-size": 128,
-        "num-layers": 5,
-        "latent-n": 10,
+        "state_size": 8,
+        "belief_size": 128,
+        "num_layers": 5,
+        "latent_n": 10,
 
         # observation distribution
-        "obs-std": 1.0,
-        "obs-bit": 5,
+        "obs_std": 1.0,
+        "obs_bit": 5,
 
         # optimization
-        "learn-rate": 0.0005,
-        "grad-clip": 10.0,
-        "max-iters": 100000,
+        "learn_rate": 0.0005,
+        "grad_clip": 10.0,
+        "max_iters": 100000,
 
         # subsequence prior params
-        "seg-num": 100,
-        "seg-len": 100,
+        "seg_num": 100,
+        "seg_len": 100,
 
         # gumbel params
-        "max-beta": 1.0,
-        "min-beta": 0.1,
-        "beta-anneal": 100,
+        "max_beta": 1.0,
+        "min_beta": 0.1,
+        "beta_anneal": 100,
 
         # log dir
-        "log-dir": "./asset/log/",
+        "log_dir": "./asset/log/",
 
         # coding length params
         "kl_coeff": 1.0,
