@@ -7,11 +7,7 @@ from cluster import exit_for_resume, read_params_from_cmdline, save_metrics_para
 
 
 
-if __name__ == "__main__":
-    # Error before update_params (has separate handling)
-    if np.random.rand() < 0.05:
-        raise ValueError("5 percent of all jobs die early for testing")
-    
+if __name__ == "__main__":    
 
     params = read_params_from_cmdline()
     main(params=params)
