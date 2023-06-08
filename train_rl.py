@@ -341,10 +341,11 @@ def main(params=None):
 
             np.set_printoptions(threshold=100000)
             torch.set_printoptions(threshold=100000)
+            print(f"b_idx, : {b_idx}")
             if b_idx % 200 == 0:
                 exp_dir = os.path.join("experiments", args["name"], str(b_idx))
                 os.makedirs(exp_dir, exist_ok=True)
-                print(f"exp_dir: {exp_dir}")
+                print(f"exp_dir, : {exp_dir}")
                 for batch_idx in range(min(train_obs_list.shape[0], 10)):
                     states = train_obs_list[batch_idx][init_size:-init_size]
                     actions = train_action_list[batch_idx][init_size:-init_size]
