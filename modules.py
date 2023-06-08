@@ -401,7 +401,8 @@ class D4RlEncoder(nn.Module):
             nn.Linear(input_dim, feat_size),  nn.ReLU(),
             nn.Linear(feat_size, output_dim),  
         )
-
+        self.output_size = output_dim
+        self.embedding_size = self.output_size
     def forward(self, inpt):
         return self.model(inpt)
 
