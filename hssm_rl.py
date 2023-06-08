@@ -800,6 +800,7 @@ class EnvModel(nn.Module):
         ########################################################
         # obs_rec_list: (batch_size, seq_len, action_dim)
         # action_list: (batch_size, seq_len)
+        print(f"action_list.shape:{action_list.shape}")
         obs_cost = F.cross_entropy(
             obs_rec_list.reshape(-1, obs_rec_list.shape[-1]),
             action_list[:, init_size:-init_size].reshape(-1),
