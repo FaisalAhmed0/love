@@ -24,6 +24,7 @@ from modules import (
     GridActionEncoder,
 )
 from datetime import datetime
+import time
 import wandb
 
 LOGGER = logging.getLogger(__name__)
@@ -273,8 +274,10 @@ def main(params=None):
     # for each iter
     torch.autograd.set_detect_anomaly(False)
     b_idx = 0
+    start_time = time.time()
     while b_idx <= args["max_iters"]:
         # for each batch
+        print("Outside of the batch loop")
         for train_obs_list, train_action_list in train_loader:
             b_idx += 1
             # mask temp annealing

@@ -10,4 +10,4 @@ from cluster import exit_for_resume, read_params_from_cmdline, save_metrics_para
 if __name__ == "__main__":    
 
     params = read_params_from_cmdline()
-    main(params=params)
+    exitcode = main(params=params)
