@@ -12,6 +12,7 @@ from torch.optim import Adam
 from grid_world import grid
 from gym_miniworld import miniworld
 from world3d import world3d
+from pathlib import Path
 
 from gym_miniworld import miniworld
 from world3d import world3d
@@ -149,392 +150,419 @@ def set_exp_name(args):
     exp_name = args["name"] + "_" + date_str()
     return exp_name
 
-def main(params=None):
-    # parse arguments
-    args = parse_args()
-    cmd_args = params
-    if cmd_args:
-        for key in cmd_args:
-            args[key] = cmd_args[key]
-    
-    if not args["wandb"]:
-        os.environ["WANDB_MODE"] = "offline"
-    
-    # fix seed
-    np.random.seed(args["seed"])
-    torch.manual_seed(args["seed"])
-    torch.cuda.manual_seed_all(args["seed"])
-    torch.backends.cudnn.deterministic = True
 
-    # set logger
-    log_format = "[%(asctime)s] %(message)s"
-    logging.basicConfig(level=logging.INFO, format=log_format, stream=sys.stderr)
+class Workspace:
+    def __init__(self, params):
+        # parse arguments
+        self.args = parse_args()
+        self.cmd_args = params
+        if self.cmd_args:
+            for key in self.cmd_args:
+                self.args[key] = self.cmd_args[key]
+        
+        if not self.args["wandb"]:
+            os.environ["WANDB_MODE"] = "offline"
+        
+        # fix seed
+        np.random.seed(self.args["seed"])
+        torch.manual_seed(self.args["seed"])
+        torch.cuda.manual_seed_all(self.args["seed"])
+        torch.backends.cudnn.deterministic = True
 
-    # set size
-    init_size = args["init_size"]
+        # set logger
+        log_format = "[%(asctime)s] %(message)s"
+        logging.basicConfig(level=logging.INFO, format=log_format, stream=sys.stderr)
 
-    # set device as gpu
-    device = torch.device("cuda", 0)
-    # device = torch.device("cpu")
+        # set size
+        self.init_size = self.args["init_size"]
 
-    # set writer
-    exp_name = set_exp_name(args)
+        # set device as gpu
+        self.device = torch.device("cuda", 0)
+        # device = torch.device("cpu")
 
-    wandb.init(
-        project="love",
-        name=exp_name,
-        sync_tensorboard=False,
-        settings=wandb.Settings(start_method="fork"),
-    )
+        # set writer
+        exp_name = set_exp_name(self.args)
 
-    LOGGER.info("EXP NAME: " + exp_name)
-    LOGGER.info(">" * 80)
-    LOGGER.info(args)
-    LOGGER.info(">" * 80)
-
-    # load dataset
-    if "compile" in args["dataset_path"]:
-        train_loader, test_loader = utils.compile_loader(args["batch_size"])
-        # action encdoer given the trajectory
-        action_encoder = GridActionEncoder(
-            action_size=train_loader.dataset.action_size,
-            embedding_size=args["belief_size"],
+        wandb.init(
+            project="love",
+            name=exp_name,
+            sync_tensorboard=False,
+            settings=wandb.Settings(start_method="fork"),
         )
-        # observation encdoer given the trajectory
-        encoder = modules.CompILEGridEncoder(feat_size=args["belief_size"])
-        # observation decoder for recounstructing the observation given the state abstraction
-        decoder = GridDecoder(
-            input_size=args["belief_size"],
-            action_size=train_loader.dataset.action_size,
-            feat_size=args["belief_size"],
-        )
-        output_normal = True
-    elif "miniworld" in args["dataset_path"]:
-        train_loader, test_loader = utils.miniworld_loader(args["batch_size"])
-        action_encoder = GridActionEncoder(
-            action_size=train_loader.dataset.action_size,
-            embedding_size=args["belief_size"],
-        )
-        encoder = modules.MiniWorldEncoderPano(input_dim=3)
-        decoder = GridDecoder(
-            input_size=args["belief_size"],
-            action_size=train_loader.dataset.action_size,
-            feat_size=args["belief_size"],
-        )
-        output_normal = False
-    
-    elif "d4rl" in args["dataset_path"]:
-        train_loader, test_loader = utils.d4rl_loader(args["batch_size"], args["name"])
-        action_encoder = modules.D4RLActionEncoder(
-            action_size=train_loader.dataset.action_size,
-            embedding_size=args["belief_size"],
-        )
-        encoder = modules.D4RlEncoder()
-        decoder = GridDecoder(
-            input_size=args["belief_size"],
-            action_size=train_loader.dataset.action_size,
-            feat_size=args["belief_size"],
-        )
-        output_normal = True
 
-    else:
-        path = args["dataset_path"]
-        raise ValueError(f"Unrecognize dataset_path {path}")
+        LOGGER.info("EXP NAME: " + exp_name)
+        LOGGER.info(">" * 80)
+        LOGGER.info(self.args)
+        LOGGER.info(">" * 80)
 
-    seq_size = train_loader.dataset.seq_size
-
-    # init models
-    use_abs_pos_kl = args["use_abs_pos_kl"] == 1.0
-    model = EnvModel(
-        action_encoder=action_encoder,
-        encoder=encoder,
-        decoder=decoder,
-        belief_size=args["belief_size"],
-        state_size=args["state_size"],
-        num_layers=args["num_layers"],
-        max_seg_len=args["seg_len"],
-        max_seg_num=args["seg_num"],
-        latent_n=args["latent_n"],
-        kl_coeff=args["kl_coeff"],
-        rec_coeff=args["rec_coeff"],
-        use_abs_pos_kl=use_abs_pos_kl,
-        coding_len_coeff=args["coding_len_coeff"],
-        use_min_length_boundary_mask=args["use_min_length_boundary_mask"],
-        ddo=args["ddo"],
-        output_normal=output_normal, 
-        action_type = args["action_type"]
-    ).to(device)
-    LOGGER.info("Model initialized")
-
-    # init optimizer
-    optimizer = Adam(params=model.parameters(), lr=args["learn_rate"], amsgrad=True)
-
-    # test data
-    pre_test_full_state_list, pre_test_full_action_list =  next(iter(test_loader))
-    pre_test_full_state_list = pre_test_full_state_list.to(device)
-    pre_test_full_action_list = pre_test_full_action_list.to(device)
-
-    # for each iter
-    torch.autograd.set_detect_anomaly(False)
-    b_idx = 0
-    start_time = time.time()
-    while b_idx <= args["max_iters"]:
-        for train_obs_list, train_action_list in train_loader:
-            b_idx += 1
-            # mask temp annealing
-            if args["beta_anneal"]:
-                model.state_model.mask_beta = (
-                    args["max_beta"] - args["min_beta"]
-                ) * 0.999 ** (b_idx / args["beta_anneal"]) + args["beta_anneal"]
-            else:
-                model.state_model.mask_beta = args["max_beta"]
-
-            ##############
-            # train time #
-            ##############
-            train_obs_list = train_obs_list.to(device)
-            train_action_list = train_action_list.to(device)
-
-            # run model with train mode
-            model.train()
-            optimizer.zero_grad()
-            results = model(
-                train_obs_list, train_action_list, seq_size, init_size, args["obs_std"]
+        # load dataset
+        if "compile" in self.args["dataset_path"]:
+            self.train_loader, self.test_loader = utils.compile_loader(self.args["batch_size"])
+            # action encdoer given the trajectory
+            self.action_encoder = GridActionEncoder(
+                action_size=self.train_loader.dataset.action_size,
+                embedding_size=self.args["belief_size"],
             )
+            # observation encdoer given the trajectory
+            self.encoder = modules.CompILEGridEncoder(feat_size=self.args["belief_size"])
+            # observation decoder for recounstructing the observation given the state abstraction
+            self.decoder = GridDecoder(
+                input_size=self.rgs["belief_size"],
+                action_size=self.train_loader.dataset.action_size,
+                feat_size=self.args["belief_size"],
+            )
+            self.output_normal = True
+        elif "miniworld" in self.args["dataset_path"]:
+            self.train_loader, self.test_loader = utils.miniworld_loader(self.args["batch_size"])
+            self.action_encoder = GridActionEncoder(
+                action_size=self.train_loader.dataset.action_size,
+                embedding_size=self.args["belief_size"],
+            )
+            self.encoder = modules.MiniWorldEncoderPano(input_dim=3)
+            self.decoder = GridDecoder(
+                input_size=self.args["belief_size"],
+                action_size=self.train_loader.dataset.action_size,
+                feat_size=self.args["belief_size"],
+            )
+            self.output_normal = False
+        
+        elif "d4rl" in self.args["dataset_path"]:
+            self.train_loader, self.test_loader = utils.d4rl_loader(self.args["batch_size"], self.args["name"])
+            self.action_encoder = modules.D4RLActionEncoder(
+                action_size=self.train_loader.dataset.action_size,
+                embedding_size=self.args["belief_size"],
+            )
+            self.encoder = modules.D4RlEncoder()
+            self.decoder = GridDecoder(
+                input_size=self.args["belief_size"],
+                action_size=self.train_loader.dataset.action_size,
+                feat_size=self.args["belief_size"],
+            )
+            self.output_normal = True
 
-            if args["coding_len_coeff"] > 0:
-                if results["obs_cost"].mean() < 0.02:
-                    model.coding_len_coeff += 0.00002
-                elif b_idx > 0:
-                    model.coding_len_coeff -= 0.00002
+        else:
+            path = self.args["dataset_path"]
+            raise ValueError(f"Unrecognize dataset_path {path}")
 
-                model.coding_len_coeff = min(0.05, model.coding_len_coeff)
-                model.coding_len_coeff = max(0.000000, model.coding_len_coeff)
-                results["coding_len_coeff"] = model.coding_len_coeff
+        seq_size = self.train_loader.dataset.seq_size
 
-            # get train loss and backward update
-            train_total_loss = results["train_loss"]
-            train_total_loss.backward()
-            if args["grad_clip"] > 0.0:
-                grad_norm = nn.utils.clip_grad_norm_(
-                    model.parameters(), args["grad_clip"], error_if_nonfinite=True)
-            optimizer.step()
-            
+        # init models
+        use_abs_pos_kl = self.args["use_abs_pos_kl"] == 1.0
+        self.model = EnvModel(
+            action_encoder=self.action_encoder,
+            encoder=self.encoder,
+            decoder=self.decoder,
+            belief_size=self.args["belief_size"],
+            state_size=self.args["state_size"],
+            num_layers=self.args["num_layers"],
+            max_seg_len=self.args["seg_len"],
+            max_seg_num=self.args["seg_num"],
+            latent_n=self.args["latent_n"],
+            kl_coeff=self.args["kl_coeff"],
+            rec_coeff=self.args["rec_coeff"],
+            use_abs_pos_kl=use_abs_pos_kl,
+            coding_len_coeff=self.args["coding_len_coeff"],
+            use_min_length_boundary_mask=self.args["use_min_length_boundary_mask"],
+            ddo=self.args["ddo"],
+            output_normal=self.output_normal, 
+            action_type = self.args["action_type"]
+        ).to(self.device)
+        LOGGER.info("Model initialized")
 
-            # log
-            if b_idx % 5 == 0:
-                results["grad_norm"] = grad_norm
-                train_stats, log_str, log_data = utils.log_train(results, None, b_idx)
-                if not "d4rl" in params["dataset_path"]:
-                    # Boundaries for grid world
-                    true_boundaries = train_action_list[:, init_size:-init_size] == 4
-                    true_boundaries = torch.roll(true_boundaries, 1, -1)
-                    true_boundaries[:, 0] = True
-                    correct_boundaries = torch.logical_and(
-                        results["mask_data"].squeeze(-1) == true_boundaries, true_boundaries
-                    ).sum()
-                    num_pred_boundaries = results["mask_data"].sum()
-                    num_true_boundaries = true_boundaries.sum()
-                    train_stats["train/precision"] = (
-                        correct_boundaries / num_pred_boundaries
-                    )
-                    train_stats["train/recall"] = correct_boundaries / num_true_boundaries
+        # init optimizer
+        self.optimizer = Adam(params=self.model.parameters(), lr=self.args["learn_rate"], amsgrad=True)
 
-                    LOGGER.info(log_str, *log_data)
-                wandb.log(train_stats, step=b_idx)
+        # test data
+        self.pre_test_full_state_list, self.pre_test_full_action_list =  next(iter(self.test_loader))
+        self.pre_test_full_state_list = self.pre_test_full_state_list.to(self.device)
+        self.pre_test_full_action_list = self.pre_test_full_action_list.to(self.device)
 
-            np.set_printoptions(threshold=100000)
-            torch.set_printoptions(threshold=100000)
-            
-            if b_idx % 200 == 0:
-                exp_dir = os.path.join("/home/fmohamed/love_experiments", args["name"], str(b_idx))
-                os.makedirs(exp_dir, exist_ok=True)
-                for batch_idx in range(min(train_obs_list.shape[0], 10)):
-                    states = train_obs_list[batch_idx][init_size:-init_size]
-                    actions = train_action_list[batch_idx][init_size:-init_size]
-                    reconstructed_actions = torch.argmax(results["rec_data"], -1)[
-                        batch_idx
-                    ]
-                    options = results["option_list"][batch_idx]
-                    boundaries = results["mask_data"][batch_idx]
-                    frames = []
-                    curr_option = options[0]
+        # for each iter
+        torch.autograd.set_detect_anomaly(False)
+        self.b_idx = 0
+
+    def main(self, params=None):
+        start_time = time.time()
+        b_idx = self.b_idx
+        while b_idx <= self.args["max_iters"]:
+            for train_obs_list, train_action_list in self.train_loader:
+                b_idx += 1
+                # mask temp annealing
+                if self.args["beta_anneal"]:
+                    self.model.state_model.mask_beta = (
+                        self.args["max_beta"] - self.args["min_beta"]
+                    ) * 0.999 ** (b_idx / self.args["beta_anneal"]) + self.args["beta_anneal"]
+                else:
+                    self.model.state_model.mask_beta = self.args["max_beta"]
+
+                ##############
+                # train time #
+                ##############
+                train_obs_list = train_obs_list.to(self.device)
+                train_action_list = train_action_list.to(self.device)
+
+                # run model with train mode
+                self.model.train()
+                self.optimizer.zero_grad()
+                results = self.model(
+                    train_obs_list, train_action_list, self.seq_size, self.init_size, self.args["obs_std"]
+                )
+
+                if self.args["coding_len_coeff"] > 0:
+                    if results["obs_cost"].mean() < 0.02:
+                        self.model.coding_len_coeff += 0.00002
+                    elif b_idx > 0:
+                        self.model.coding_len_coeff -= 0.00002
+
+                    self.model.coding_len_coeff = min(0.05, self.model.coding_len_coeff)
+                    self.model.coding_len_coeff = max(0.000000, self.model.coding_len_coeff)
+                    results["coding_len_coeff"] = self.model.coding_len_coeff
+
+                # get train loss and backward update
+                train_total_loss = results["train_loss"]
+                train_total_loss.backward()
+                if self.args["grad_clip"] > 0.0:
+                    grad_norm = nn.utils.clip_grad_norm_(
+                        self.model.parameters(), self.args["grad_clip"], error_if_nonfinite=True)
+                self.optimizer.step()
+                
+
+                # log
+                if b_idx % 5 == 0:
+                    results["grad_norm"] = grad_norm
+                    train_stats, log_str, log_data = utils.log_train(results, None, b_idx)
                     if not "d4rl" in params["dataset_path"]:
-                        for seq_idx in range(states.shape[0]):
-                            # read new option if boundary is 1
-                            if boundaries[seq_idx].item() == 1:
-                                curr_option = options[seq_idx]
+                        # Boundaries for grid world
+                        true_boundaries = train_action_list[:, self.init_size:-self.init_size] == 4
+                        true_boundaries = torch.roll(true_boundaries, 1, -1)
+                        true_boundaries[:, 0] = True
+                        correct_boundaries = torch.logical_and(
+                            results["mask_data"].squeeze(-1) == true_boundaries, true_boundaries
+                        ).sum()
+                        num_pred_boundaries = results["mask_data"].sum()
+                        num_true_boundaries = true_boundaries.sum()
+                        train_stats["train/precision"] = (
+                            correct_boundaries / num_pred_boundaries
+                        )
+                        train_stats["train/recall"] = correct_boundaries / num_true_boundaries
 
-                            # panorama observation for miniworld
-                            if args["dataset_path"] == "miniworld":
-                                ################################################
-                                #  Begin of miniworld specific
-                                ################################################
-                                f = []
-                                for i in range(5):
-                                    f.append(states[seq_idx][:, :, i * 3 : (i + 1) * 3])
-                                frame = torch.cat(f[::-1], axis=1)
-                                frame = world3d.Render(frame.cpu().data.numpy())
-                                frame.write_text(
-                                    f"Action: {repr(miniworld.MiniWorldEnv.Actions(actions[seq_idx].item()))}")
-                                frame.write_text(
-                                    f"Reconstructed: {repr(miniworld.MiniWorldEnv.Actions(reconstructed_actions[seq_idx].item()))}")
-                                if (
-                                    actions[seq_idx].item()
-                                    == reconstructed_actions[seq_idx].item()
-                                ):
-                                    frame.write_text("CORRECT")
-                                else:
-                                    frame.write_text("WRONG")
+                        LOGGER.info(log_str, *log_data)
+                    wandb.log(train_stats, step=b_idx)
 
-                                if actions[seq_idx].item() == miniworld.MiniWorldEnv.Actions.pickup:
-                                    frame.write_text("PICKUP")
-                                else:
-                                    frame.write_text("NOT PICKUP")
+                np.set_printoptions(threshold=100000)
+                torch.set_printoptions(threshold=100000)
+                
+                if b_idx % 200 == 0:
+                    exp_dir = os.path.join("/home/fmohamed/love_experiments", self.args["name"], str(b_idx))
+                    os.makedirs(exp_dir, exist_ok=True)
+                    for batch_idx in range(min(train_obs_list.shape[0], 10)):
+                        states = train_obs_list[batch_idx][self.init_size:-self.init_size]
+                        actions = train_action_list[batch_idx][self.init_size:-self.init_size]
+                        reconstructed_actions = torch.argmax(results["rec_data"], -1)[
+                            batch_idx
+                        ]
+                        options = results["option_list"][batch_idx]
+                        boundaries = results["mask_data"][batch_idx]
+                        frames = []
+                        curr_option = options[0]
+                        if not "d4rl" in params["dataset_path"]:
+                            for seq_idx in range(states.shape[0]):
+                                # read new option if boundary is 1
+                                if boundaries[seq_idx].item() == 1:
+                                    curr_option = options[seq_idx]
 
-                                ################################################
-                                #  End of miniworld specific
-                                ################################################
-                            elif args["dataset_path"] == "compile":
-                                ################################################
-                                #  Begin of compile specific
-                                ################################################
-                                frame = grid.GridRender(10, 10)
-                                # this double for loop is for visualization
-                                for x in range(10):
-                                    for y in range(10):
-                                        obj = np.argmax(
-                                            states[seq_idx][x][y].cpu().data.numpy()
-                                        )
-                                        if (
-                                            obj == grid.ComPILEObject.num_types()
-                                            or states[seq_idx][x][y][
-                                                grid.ComPILEObject.num_types()
-                                            ]
-                                        ):
-                                            frame.draw_rectangle(
-                                                np.array((x, y)), 0.9, "cyan"
+                                # panorama observation for miniworld
+                                if self.args["dataset_path"] == "miniworld":
+                                    ################################################
+                                    #  Begin of miniworld specific
+                                    ################################################
+                                    f = []
+                                    for i in range(5):
+                                        f.append(states[seq_idx][:, :, i * 3 : (i + 1) * 3])
+                                    frame = torch.cat(f[::-1], axis=1)
+                                    frame = world3d.Render(frame.cpu().data.numpy())
+                                    frame.write_text(
+                                        f"Action: {repr(miniworld.MiniWorldEnv.Actions(actions[seq_idx].item()))}")
+                                    frame.write_text(
+                                        f"Reconstructed: {repr(miniworld.MiniWorldEnv.Actions(reconstructed_actions[seq_idx].item()))}")
+                                    if (
+                                        actions[seq_idx].item()
+                                        == reconstructed_actions[seq_idx].item()
+                                    ):
+                                        frame.write_text("CORRECT")
+                                    else:
+                                        frame.write_text("WRONG")
+
+                                    if actions[seq_idx].item() == miniworld.MiniWorldEnv.Actions.pickup:
+                                        frame.write_text("PICKUP")
+                                    else:
+                                        frame.write_text("NOT PICKUP")
+
+                                    ################################################
+                                    #  End of miniworld specific
+                                    ################################################
+                                elif self.args["dataset_path"] == "compile":
+                                    ################################################
+                                    #  Begin of compile specific
+                                    ################################################
+                                    frame = grid.GridRender(10, 10)
+                                    # this double for loop is for visualization
+                                    for x in range(10):
+                                        for y in range(10):
+                                            obj = np.argmax(
+                                                states[seq_idx][x][y].cpu().data.numpy()
                                             )
-                                        elif obj == grid.ComPILEObject.num_types() + 1:
-                                            frame.draw_rectangle(
-                                                np.array((x, y)), 0.7, "black"
-                                            )
-                                        elif states[seq_idx][x][y][obj] == 1:
-                                            frame.draw_rectangle(
-                                                np.array((x, y)),
-                                                0.4,
-                                                grid.ComPILEObject.COLORS[obj],
-                                            )
+                                            if (
+                                                obj == grid.ComPILEObject.num_types()
+                                                or states[seq_idx][x][y][
+                                                    grid.ComPILEObject.num_types()
+                                                ]
+                                            ):
+                                                frame.draw_rectangle(
+                                                    np.array((x, y)), 0.9, "cyan"
+                                                )
+                                            elif obj == grid.ComPILEObject.num_types() + 1:
+                                                frame.draw_rectangle(
+                                                    np.array((x, y)), 0.7, "black"
+                                                )
+                                            elif states[seq_idx][x][y][obj] == 1:
+                                                frame.draw_rectangle(
+                                                    np.array((x, y)),
+                                                    0.4,
+                                                    grid.ComPILEObject.COLORS[obj],
+                                                )
+                                    frame.write_text(
+                                        f"Action: {repr(grid.Action(actions[seq_idx].item()))}"
+                                    )
+                                    frame.write_text(
+                                        f"Reconstructed: {repr(grid.Action(reconstructed_actions[seq_idx].item()))}"
+                                    )
+                                    if (
+                                        actions[seq_idx].item()
+                                        == reconstructed_actions[seq_idx].item()
+                                    ):
+                                        frame.write_text("CORRECT")
+                                    else:
+                                        frame.write_text("WRONG")
+                                    ################################################
+                                    #  End of compile specific
+                                    ################################################
+                                frame.write_text(f"Option: {curr_option}")
+                                frame.write_text(f"Boundary: {boundaries[seq_idx].item()}")
+                                frame.write_text(f"Obs NLL: {results['obs_cost'].mean()}")
                                 frame.write_text(
-                                    f"Action: {repr(grid.Action(actions[seq_idx].item()))}"
+                                    f"Coding length: {results['encoding_length'].item()}"
                                 )
                                 frame.write_text(
-                                    f"Reconstructed: {repr(grid.Action(reconstructed_actions[seq_idx].item()))}"
+                                    f"Num reads: {results['mask_data'].sum(1).mean().item()}"
                                 )
-                                if (
-                                    actions[seq_idx].item()
-                                    == reconstructed_actions[seq_idx].item()
-                                ):
-                                    frame.write_text("CORRECT")
-                                else:
-                                    frame.write_text("WRONG")
-                                ################################################
-                                #  End of compile specific
-                                ################################################
-                            frame.write_text(f"Option: {curr_option}")
-                            frame.write_text(f"Boundary: {boundaries[seq_idx].item()}")
-                            frame.write_text(f"Obs NLL: {results['obs_cost'].mean()}")
-                            frame.write_text(
-                                f"Coding length: {results['encoding_length'].item()}"
-                            )
-                            frame.write_text(
-                                f"Num reads: {results['mask_data'].sum(1).mean().item()}"
-                            )
-                            frames.append(frame.image())
+                                frames.append(frame.image())
 
-                        save_path = os.path.join(exp_dir, f"{batch_idx}.gif")
-                        frames[0].save(
-                            save_path,
-                            save_all=True,
-                            append_images=frames[1:],
-                            duration=750,
-                            loop=0,
-                            optimize=True,
-                            quality=20,
+                            save_path = os.path.join(exp_dir, f"{batch_idx}.gif")
+                            frames[0].save(
+                                save_path,
+                                save_all=True,
+                                append_images=frames[1:],
+                                duration=750,
+                                loop=0,
+                                optimize=True,
+                                quality=20,
+                            )
+
+                if b_idx % 100 == 0:
+                    LOGGER.info("#" * 80)
+                    LOGGER.info(">>> option list")
+                    LOGGER.info("\n" + repr(results["option_list"][:10]))
+                    LOGGER.info(">>> boundary mask list")
+                    LOGGER.info("\n" + repr(results["mask_data"][:10].squeeze(-1)))
+                    LOGGER.info(">>> train_action_list")
+                    LOGGER.info("\n" + repr(train_action_list[:10]))
+                    LOGGER.info(">>> argmax reconstruction")
+                    LOGGER.info("\n" + repr(torch.argmax(results["rec_data"], -1)[:10]))
+                    LOGGER.info(">>> diff")
+                    LOGGER.info(
+                        "\n"
+                        + repr(
+                            train_action_list[:10, 1:-1]
+                            - torch.argmax(results["rec_data"][:10], -1)
+                        )
+                    )
+                    LOGGER.info(">>> marginal")
+                    LOGGER.info("\n" + repr(results["marginal"]))
+                    LOGGER.info("#" * 80)
+
+                if b_idx % 2000 == 0:
+                    exp_dir = os.path.join("experiments", self.args["name"])
+                    torch.save(
+                        self.model.state_model, os.path.join(exp_dir, f"model-{b_idx}.ckpt")
+                    )
+
+                #############
+                # test time #
+                #############
+                if b_idx % 100 == 0:
+                    with torch.no_grad():
+                        ##################
+                        # test data elbo #
+                        ##################
+                        self.model.eval()
+                        results = self.model(
+                            self.pre_test_full_state_list,
+                            self.pre_test_full_action_list,
+                            self.seq_size,
+                            self.init_size,
+                            self.args["obs_std"],
                         )
 
-            if b_idx % 100 == 0:
-                LOGGER.info("#" * 80)
-                LOGGER.info(">>> option list")
-                LOGGER.info("\n" + repr(results["option_list"][:10]))
-                LOGGER.info(">>> boundary mask list")
-                LOGGER.info("\n" + repr(results["mask_data"][:10].squeeze(-1)))
-                LOGGER.info(">>> train_action_list")
-                LOGGER.info("\n" + repr(train_action_list[:10]))
-                LOGGER.info(">>> argmax reconstruction")
-                LOGGER.info("\n" + repr(torch.argmax(results["rec_data"], -1)[:10]))
-                LOGGER.info(">>> diff")
-                LOGGER.info(
-                    "\n"
-                    + repr(
-                        train_action_list[:10, 1:-1]
-                        - torch.argmax(results["rec_data"][:10], -1)
-                    )
-                )
-                LOGGER.info(">>> marginal")
-                LOGGER.info("\n" + repr(results["marginal"]))
-                LOGGER.info("#" * 80)
+                        # log
+                        test_stats, log_str, log_data = utils.log_test(results, None, b_idx)
+                        # Boundaries for grid world
+                        true_boundaries = (
+                            self.pre_test_full_action_list[:, self.init_size:-self.init_size] == 4
+                        )
+                        true_boundaries = torch.roll(true_boundaries, 1, -1)
+                        true_boundaries[:, 0] = True
+                        correct_boundaries = torch.logical_and(
+                            results["mask_data"].squeeze(-1) == true_boundaries,
+                            true_boundaries,
+                        ).sum()
+                        num_pred_boundaries = results["mask_data"].sum()
+                        num_true_boundaries = true_boundaries.sum()
+                        test_stats["valid/precision"] = (
+                            correct_boundaries / num_pred_boundaries
+                        )
+                        test_stats["valid/recall"] = (
+                            correct_boundaries / num_true_boundaries
+                        )
+                        LOGGER.info(log_str, *log_data)
+                        wandb.log(test_stats, step=b_idx)
+                run_time = (time.time() - start_time) / 60
+                wandb.log({"fps": run_time}, step=b_idx)        
+                if ((time.time() - start_time) / 60) > self.args["max_runtime"]:    
+                    self.save_snapshot()
+    
+    
+    def save_snapshot(self, suffix):
+        _suffix = suffix
+        snapshot_dir = Path.cwd()
+        snapshot_dir.mkdir(exist_ok=True, parents=True)
+        snapshot = snapshot_dir / f'snapshot_{_suffix}.pt'
+        # self.last_current_size = self.replay_storage.current_size
+        keys_to_save = [k for k in dir(self) if "__" not in k]
+        print(f"Keys to save")
+        quit()
+        payload = {k: self.__dict__[k] for k in keys_to_save}
+        # print(f"payload before saving: {payload}")
+        # print(f"Saving snapshot in path:{snapshot}")
+        if self.cfg.use_transitions_buffer:
+            self.replay_storage.save_data(self.work_dir)
+        else:
+            self.save_buffer(self._global_step, suffix="latest")
+        with snapshot.open('wb') as f:
+            torch.save(payload, f)
+            wandb.save(str(snapshot)) # saves checkpoint to wandb
 
-            if b_idx % 2000 == 0:
-                exp_dir = os.path.join("experiments", args["name"])
-                torch.save(
-                    model.state_model, os.path.join(exp_dir, f"model-{b_idx}.ckpt")
-                )
 
-            #############
-            # test time #
-            #############
-            if b_idx % 100 == 0:
-                with torch.no_grad():
-                    ##################
-                    # test data elbo #
-                    ##################
-                    model.eval()
-                    results = model(
-                        pre_test_full_state_list,
-                        pre_test_full_action_list,
-                        seq_size,
-                        init_size,
-                        args["obs_std"],
-                    )
-
-                    # log
-                    test_stats, log_str, log_data = utils.log_test(results, None, b_idx)
-                    # Boundaries for grid world
-                    true_boundaries = (
-                        pre_test_full_action_list[:, init_size:-init_size] == 4
-                    )
-                    true_boundaries = torch.roll(true_boundaries, 1, -1)
-                    true_boundaries[:, 0] = True
-                    correct_boundaries = torch.logical_and(
-                        results["mask_data"].squeeze(-1) == true_boundaries,
-                        true_boundaries,
-                    ).sum()
-                    num_pred_boundaries = results["mask_data"].sum()
-                    num_true_boundaries = true_boundaries.sum()
-                    test_stats["valid/precision"] = (
-                        correct_boundaries / num_pred_boundaries
-                    )
-                    test_stats["valid/recall"] = (
-                        correct_boundaries / num_true_boundaries
-                    )
-                    LOGGER.info(log_str, *log_data)
-                    wandb.log(test_stats, step=b_idx)
-            run_time = (time.time() - start_time) / 60
-            wandb.log({"run_time": run_time}, step=b_idx)        
-            if ((time.time() - start_time) / 60) > args["max_runtime"]:    
-                print("I am here")
-                quit()
 
 if __name__ == "__main__":
-    main()
+    pass
