@@ -605,6 +605,7 @@ class Workspace:
             # wandb.save(str(snapshot)) # saves checkpoint to wandb
 
     def load_snapshot(self):
+        print(f"Loading snapshot")
         name = self.args["name"]
         snapshot_dir = Path(f"/home/fmohamed/love_snapshots_{name}")
         snapshot = snapshot_dir / f'snapshot_latest.pt'

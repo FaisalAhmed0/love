@@ -17,6 +17,7 @@ def main():
     if os.path.exists(snapshot):
         workspace.load_snapshot()
         resume = True
+        print("This path exists")
     workspace = Workspace(params, resume)
     exitcode = workspace.main()
     if exitcode == 3:
