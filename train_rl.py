@@ -549,18 +549,11 @@ class Workspace:
         snapshot = snapshot_dir / f'snapshot_{_suffix}.pt'
         # self.last_current_size = self.replay_storage.current_size
         keys_to_save = [k for k in dir(self) if "__" not in k]
-        print(f"Keys to save: {keys_to_save}")
-        quit()
+        print(f"snapshot directory: {snapshot_dir}")
         payload = {k: self.__dict__[k] for k in keys_to_save}
-        # print(f"payload before saving: {payload}")
-        # print(f"Saving snapshot in path:{snapshot}")
-        if self.cfg.use_transitions_buffer:
-            self.replay_storage.save_data(self.work_dir)
-        else:
-            self.save_buffer(self._global_step, suffix="latest")
         with snapshot.open('wb') as f:
             torch.save(payload, f)
-            wandb.save(str(snapshot)) # saves checkpoint to wandb
+            # wandb.save(str(snapshot)) # saves checkpoint to wandb
 
 
 
