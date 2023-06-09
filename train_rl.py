@@ -591,7 +591,7 @@ class Workspace:
 
     def save_snapshot(self, suffix):
         # _suffix = suffix
-        snapshot_dir = Path("/home/fmohamed/love_snapshots")
+        snapshot_dir = Path(f"/home/fmohamed/love_snapshots_{name}")
         snapshot_dir.mkdir(exist_ok=True, parents=True)
         snapshot = snapshot_dir / f'snapshot_latest.pt'
         # self.last_current_size = self.replay_storage.current_size
