@@ -67,7 +67,7 @@
         "values": ["d"]
       },
       {
-        "param": "max_time",
+        "param": "max_runtime",
         "values": [90]
       },
       {

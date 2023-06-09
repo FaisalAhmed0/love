@@ -527,10 +527,10 @@ class Workspace:
 
                 if b_idx % 2000 == 0:
                     exp_dir = os.path.join("experiments", self.args["name"])
-                    torch.save(
-                        self.model.state_model, os.path.join(
-                            exp_dir, f"model-{b_idx}.ckpt")
-                    )
+                    # torch.save(
+                    #     self.model.state_model, os.path.join(
+                    #         exp_dir, f"model-{b_idx}.ckpt")
+                    # )
 
                 #############
                 # test time #
