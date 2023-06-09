@@ -207,7 +207,7 @@ class Workspace:
             self.encoder = modules.CompILEGridEncoder(feat_size=self.args["belief_size"])
             # observation decoder for recounstructing the observation given the state abstraction
             self.decoder = GridDecoder(
-                input_size=self.rgs["belief_size"],
+                input_size=self.args["belief_size"],
                 action_size=self.train_loader.dataset.action_size,
                 feat_size=self.args["belief_size"],
             )
