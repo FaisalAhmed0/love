@@ -159,7 +159,7 @@ class Workspace:
         if self.cmd_args:
             for key in self.cmd_args:
                 self.args[key] = self.cmd_args[key]
-        
+        self.params =  self.args
         if not self.args["wandb"]:
             os.environ["WANDB_MODE"] = "offline"
         
@@ -281,7 +281,7 @@ class Workspace:
         torch.autograd.set_detect_anomaly(False)
         self.b_idx = 0
 
-    def main(self, params=None):
+    def main(self):
         start_time = time.time()
         b_idx = self.b_idx
         while b_idx <= self.args["max_iters"]:
@@ -331,7 +331,7 @@ class Workspace:
                 if b_idx % 5 == 0:
                     results["grad_norm"] = grad_norm
                     train_stats, log_str, log_data = utils.log_train(results, None, b_idx)
-                    if not "d4rl" in params["dataset_path"]:
+                    if not "d4rl" in self.params["dataset_path"]:
                         # Boundaries for grid world
                         true_boundaries = train_action_list[:, self.init_size:-self.init_size] == 4
                         true_boundaries = torch.roll(true_boundaries, 1, -1)
@@ -365,7 +365,7 @@ class Workspace:
                         boundaries = results["mask_data"][batch_idx]
                         frames = []
                         curr_option = options[0]
-                        if not "d4rl" in params["dataset_path"]:
+                        if not "d4rl" in self.params["dataset_path"]:
                             for seq_idx in range(states.shape[0]):
                                 # read new option if boundary is 1
                                 if boundaries[seq_idx].item() == 1:
