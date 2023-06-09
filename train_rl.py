@@ -549,7 +549,7 @@ class Workspace:
         snapshot = snapshot_dir / f'snapshot_{_suffix}.pt'
         # self.last_current_size = self.replay_storage.current_size
         keys_to_save = [k for k in dir(self) if "__" not in k]
-        print(f"Keys to save")
+        print(f"Keys to save: {keys_to_save}")
         quit()
         payload = {k: self.__dict__[k] for k in keys_to_save}
         # print(f"payload before saving: {payload}")
