@@ -1,3 +1,6 @@
+from pyvirtualdisplay import Display
+display = Display(visible=0, size=(1400, 900))
+display.start()
 import os
 import time
 

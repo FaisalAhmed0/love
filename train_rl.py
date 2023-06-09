@@ -1,6 +1,3 @@
-from pyvirtualdisplay import Display
-display = Display(visible=0, size=(1400, 900))
-display.start()
 import wandb
 import time
 from datetime import datetime
