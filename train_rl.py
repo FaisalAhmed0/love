@@ -582,8 +582,8 @@ class Workspace:
                         )
                         LOGGER.info(log_str, *log_data)
                         wandb.log(test_stats, step=b_idx)
-                run_time = (time.time() - start_time) / 60
-                wandb.log({"fps": run_time}, step=b_idx)
+                self.run_time = (time.time() - start_time) / 60
+                wandb.log({"fps": self.run_time}, step=b_idx)
                 if ((time.time() - start_time) / 60) > self.args["max_runtime"]:
                     self.save_snapshot(f"_{b_idx}")
                     print(f"Saving snapshot and exit for resume")
@@ -591,13 +591,14 @@ class Workspace:
 
     def save_snapshot(self, suffix):
         # _suffix = suffix
+        name = self.args["name"]
         snapshot_dir = Path(f"/home/fmohamed/love_snapshots_{name}")
         snapshot_dir.mkdir(exist_ok=True, parents=True)
         snapshot = snapshot_dir / f'snapshot_latest.pt'
         # self.last_current_size = self.replay_storage.current_size
         keys_to_save = ['action_encoder', 'args', 'b_idx', 'cmd_args', 'decoder', 'device', 
                         'encoder', 'init_size', 'model', 'optimizer', 'output_normal', 'params',
-                        'pre_test_full_action_list', 'pre_test_full_state_list', 'seq_size', 'test_loader', 'train_loader', "uid"]
+                        'pre_test_full_action_list', 'pre_test_full_state_list', 'seq_size', 'test_loader', 'train_loader', "uid", "run_time"]
         payload = {k: self.__dict__[k] for k in keys_to_save}
         with snapshot.open('wb') as f:
             torch.save(payload, f)
@@ -628,6 +629,7 @@ class Workspace:
         self.train_loader = payload["train_loader"]
         self.output_normal = payload["output_normal"]
         self.uid = payload["uid"]
+        self.run_time = payload["run_time"]
         
 
     
