@@ -1,6 +1,6 @@
 from pyvirtualdisplay import Display
 display = Display(visible=0, size=(300, 300))
-display.sendstop()
+display.stop()
 display.start()
 import wandb
 import time
