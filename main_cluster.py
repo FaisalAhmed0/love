@@ -14,6 +14,7 @@ def main():
     name = params["name"]
     snapshot_dir = Path(f"/home/fmohamed/love_snapshots_{name}")
     snapshot = snapshot_dir / f'snapshot_latest.pt'
+    print(f"snapshot_dir:{snapshot}")
     if os.path.exists(snapshot):
         workspace.load_snapshot()
         resume = True
