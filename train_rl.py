@@ -1,6 +1,6 @@
-from pyvirtualdisplay import Display
-display = Display(visible=0, size=(300, 300))
-display.start()
+# from pyvirtualdisplay import Display
+# display = Display(visible=0, size=(300, 300))
+# display.start()
 import wandb
 import time
 from datetime import datetime
@@ -12,8 +12,8 @@ import modules
 import utils
 from hssm_rl import EnvModel
 from pathlib import Path
-from world3d import world3d
-from gym_miniworld import miniworld
+# from world3d import world3d
+# from gym_miniworld import miniworld
 from grid_world import grid
 from torch.optim import Adam
 import torch.nn as nn
@@ -388,32 +388,33 @@ class Workspace:
 
                                 # panorama observation for miniworld
                                 if self.args["dataset_path"] == "miniworld":
+                                    pass
                                     ################################################
                                     #  Begin of miniworld specific
                                     ################################################
-                                    f = []
-                                    for i in range(5):
-                                        f.append(
-                                            states[seq_idx][:, :, i * 3: (i + 1) * 3])
-                                    frame = torch.cat(f[::-1], axis=1)
-                                    frame = world3d.Render(
-                                        frame.cpu().data.numpy())
-                                    frame.write_text(
-                                        f"Action: {repr(miniworld.MiniWorldEnv.Actions(actions[seq_idx].item()))}")
-                                    frame.write_text(
-                                        f"Reconstructed: {repr(miniworld.MiniWorldEnv.Actions(reconstructed_actions[seq_idx].item()))}")
-                                    if (
-                                        actions[seq_idx].item()
-                                        == reconstructed_actions[seq_idx].item()
-                                    ):
-                                        frame.write_text("CORRECT")
-                                    else:
-                                        frame.write_text("WRONG")
+                                    # f = []
+                                    # for i in range(5):
+                                    #     f.append(
+                                    #         states[seq_idx][:, :, i * 3: (i + 1) * 3])
+                                    # frame = torch.cat(f[::-1], axis=1)
+                                    # frame = world3d.Render(
+                                    #     frame.cpu().data.numpy())
+                                    # frame.write_text(
+                                    #     f"Action: {repr(miniworld.MiniWorldEnv.Actions(actions[seq_idx].item()))}")
+                                    # frame.write_text(
+                                    #     f"Reconstructed: {repr(miniworld.MiniWorldEnv.Actions(reconstructed_actions[seq_idx].item()))}")
+                                    # if (
+                                    #     actions[seq_idx].item()
+                                    #     == reconstructed_actions[seq_idx].item()
+                                    # ):
+                                    #     frame.write_text("CORRECT")
+                                    # else:
+                                    #     frame.write_text("WRONG")
 
-                                    if actions[seq_idx].item() == miniworld.MiniWorldEnv.Actions.pickup:
-                                        frame.write_text("PICKUP")
-                                    else:
-                                        frame.write_text("NOT PICKUP")
+                                    # if actions[seq_idx].item() == miniworld.MiniWorldEnv.Actions.pickup:
+                                    #     frame.write_text("PICKUP")
+                                    # else:
+                                    #     frame.write_text("NOT PICKUP")
 
                                     ################################################
                                     #  End of miniworld specific
