@@ -69,6 +69,10 @@
       {
         "param": "max_time",
         "values": [90]
+      },
+      {
+        "param": "seed",
+        "values": [1]
       }
     ]
   }
