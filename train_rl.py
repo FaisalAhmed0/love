@@ -244,7 +244,7 @@ class Workspace:
             path = self.args["dataset_path"]
             raise ValueError(f"Unrecognize dataset_path {path}")
 
-        seq_size = self.train_loader.dataset.seq_size
+        self.seq_size = self.train_loader.dataset.seq_size
 
         # init models
         use_abs_pos_kl = self.args["use_abs_pos_kl"] == 1.0
