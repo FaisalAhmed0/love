@@ -570,12 +570,14 @@ class Workspace:
                 wandb.log({"fps": run_time}, step=b_idx)
                 if ((time.time() - start_time) / 60) > self.args["max_runtime"]:
                     self.save_snapshot(f"_{b_idx}")
+                    print(f"Saving snapshot and exit for resume")
+                    return 3
 
     def save_snapshot(self, suffix):
-        _suffix = suffix
+        # _suffix = suffix
         snapshot_dir = Path("/home/fmohamed/love_snapshots")
         snapshot_dir.mkdir(exist_ok=True, parents=True)
-        snapshot = snapshot_dir / f'snapshot_{_suffix}.pt'
+        snapshot = snapshot_dir / f'snapshot_latest.pt'
         # self.last_current_size = self.replay_storage.current_size
         keys_to_save = ['action_encoder', 'args', 'b_idx', 'cmd_args', 'decoder', 'device', 
                         'encoder', 'init_size', 'model', 'optimizer', 'output_normal', 'params',
@@ -584,6 +586,37 @@ class Workspace:
         with snapshot.open('wb') as f:
             torch.save(payload, f)
             # wandb.save(str(snapshot)) # saves checkpoint to wandb
+
+    def load_snapshot(self):
+        name = self.args["name"]
+        snapshot_dir = Path(f"/home/fmohamed/love_snapshots_{name}")
+        snapshot = snapshot_dir / f'snapshot_latest.pt'
+        with snapshot.open('rb') as f:
+            payload = torch.load(f)
+        # load attributes from the payload
+        ['action_encoder', 'args', 'b_idx', 'cmd_args', 'decoder', 'device', 
+                        'encoder', 'init_size', 'model', 'optimizer', 'output_normal', 'params',
+                        'pre_test_full_action_list', 'pre_test_full_state_list', 'seq_size', 'test_loader', 'train_loader']
+        self.action_encoder = payload["action_encoder"]
+        self.args = payload["args"]
+        self.b_idx = payload["b_idx"]
+        self.cmd_args = payload["cmd_args"]
+        self.decoder = payload["decoder"]
+        self.device = payload["device"]
+        self.encoder = payload["encoder"]
+        self.init_size = payload["init_size"]
+        self.model = payload["model"]
+        self.optimizer = payload["optimizer"]
+        self.params = payload["params"]
+        self.pre_test_full_action_list = payload["pre_test_full_action_list"]
+        self.pre_test_full_state_list = payload["pre_test_full_state_list"]
+        self.seq_size = payload["seq_size"]
+        self.test_loader = payload["test_loader"]
+        self.train_loader = payload["train_loader"]
+        self.output_normal = payload["output_normal"]
+        
+
+    
 
 
 if __name__ == "__main__":
