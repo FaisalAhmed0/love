@@ -65,6 +65,10 @@
       {
         "param": "action_type",
         "values": ["d"]
+      },
+      {
+        "param": "max_time",
+        "values": [90]
       }
     ]
   }
