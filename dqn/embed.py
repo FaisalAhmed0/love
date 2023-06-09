@@ -31,8 +31,16 @@ class IdentityEmbedder(Embedder):
     def __init__(self, embed_dim):
         super().__init__(embed_dim)
 
-    def forward(self, input):
-        return nn.Identity()(input)
+    def forward(self, input, hidden_state=None):
+        input = torch.tensor(input, device=input[0].device)
+        return nn.Identity()(input), hidden_state
+    
+    @property
+    def embed_dim(self):
+        """Returns the dimension of the output (int)."""
+        return self._embed_dim
+    
+
 
 
 class RecurrentStateEmbedder(Embedder):

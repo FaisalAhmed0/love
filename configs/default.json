@@ -2,6 +2,7 @@
   "agent": {
     "policy": {
       "type": "vanilla",
+      "action_type": "d",
       "epsilon_schedule": {
         "begin": 1.0,
         "end": 0.01,
