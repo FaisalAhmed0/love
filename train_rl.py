@@ -549,7 +549,7 @@ class Workspace:
         snapshot = snapshot_dir / f'snapshot_{_suffix}.pt'
         # self.last_current_size = self.replay_storage.current_size
         keys_to_save = [k for k in dir(self) if (("__" not in k) and( "main" not in k))]
-        print(f"snapshot directory: {snapshot_dir}")
+        print(f"snapshot directory: {keys_to_save}")
         payload = {k: self.__dict__[k] for k in keys_to_save}
         with snapshot.open('wb') as f:
             torch.save(payload, f)
