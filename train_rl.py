@@ -1,3 +1,6 @@
+from pyvirtualdisplay import Display
+display = Display(visible=0, size=(1400, 900))
+display.start()
 import wandb
 import time
 from datetime import datetime
@@ -20,9 +23,7 @@ import logging
 import os
 import sys
 import argparse
-from pyvirtualdisplay import Display
-display = Display(visible=0, size=(1400, 900))
-display.start()
+
 
 
 LOGGER = logging.getLogger(__name__)
@@ -150,6 +151,7 @@ def set_exp_name(args):
 
 class Workspace:
     def __init__(self, params):
+        
         # parse arguments
         self.args = parse_args()
         self.cmd_args = params
