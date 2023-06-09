@@ -1,6 +1,5 @@
 from pyvirtualdisplay import Display
 display = Display(visible=0, size=(300, 300))
-display.stop()
 display.start()
 import wandb
 import time
@@ -570,6 +569,7 @@ class Workspace:
                 wandb.log({"fps": run_time}, step=b_idx)
                 if ((time.time() - start_time) / 60) > self.args["max_runtime"]:
                     self.save_snapshot(f"_{b_idx}")
+                    display.stop()
 
     def save_snapshot(self, suffix):
         _suffix = suffix
