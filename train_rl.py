@@ -1,4 +1,5 @@
-from pyvirtualdisplay import Display
+# from pyvirtualdisplay import Display
+import pyvirtualdisplay
 # display = Display(visible=0, size=(300, 300))
 # display.start()
 with pyvirtualdisplay.Display(visible=0, size=(800, 600)):
