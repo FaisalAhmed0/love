@@ -623,7 +623,6 @@ class Workspace:
         self.output_normal = payload["output_normal"]
         self.uid = payload["uid"]
         self.run_time = payload["run_time"]
-        self.load_snapshot()
         wandb.init(
             id = self.uid,
             resume="must",
