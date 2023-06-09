@@ -150,7 +150,7 @@ def set_exp_name(args):
 
 
 class Workspace:
-    def __init__(self, params):
+    def __init__(self, params, resume):
         
         # parse arguments
         self.args = parse_args()
@@ -183,12 +183,28 @@ class Workspace:
         # set writer
         exp_name = set_exp_name(self.args)
 
-        wandb.init(
-            project="love",
-            name=exp_name,
-            sync_tensorboard=False,
-            settings=wandb.Settings(start_method="fork"),
-        )
+
+        # generate an id to resume
+        if resume:
+            self.load_snapshot()
+            wandb.init(
+                id = self.uid,
+                resume="must",
+                project="love",
+                name=exp_name,
+                sync_tensorboard=False,
+                settings=wandb.Settings(start_method="fork"),
+            )
+        else:
+            self.uid = wandb.util.generate_id()
+            wandb.init(
+                id = self.uid,
+                resume="allow",
+                project="love",
+                name=exp_name,
+                sync_tensorboard=False,
+                settings=wandb.Settings(start_method="fork"),
+            )
 
         LOGGER.info("EXP NAME: " + exp_name)
         LOGGER.info(">" * 80)
@@ -581,7 +597,7 @@ class Workspace:
         # self.last_current_size = self.replay_storage.current_size
         keys_to_save = ['action_encoder', 'args', 'b_idx', 'cmd_args', 'decoder', 'device', 
                         'encoder', 'init_size', 'model', 'optimizer', 'output_normal', 'params',
-                        'pre_test_full_action_list', 'pre_test_full_state_list', 'seq_size', 'test_loader', 'train_loader']
+                        'pre_test_full_action_list', 'pre_test_full_state_list', 'seq_size', 'test_loader', 'train_loader', "uid"]
         payload = {k: self.__dict__[k] for k in keys_to_save}
         with snapshot.open('wb') as f:
             torch.save(payload, f)
@@ -594,9 +610,6 @@ class Workspace:
         with snapshot.open('rb') as f:
             payload = torch.load(f)
         # load attributes from the payload
-        ['action_encoder', 'args', 'b_idx', 'cmd_args', 'decoder', 'device', 
-                        'encoder', 'init_size', 'model', 'optimizer', 'output_normal', 'params',
-                        'pre_test_full_action_list', 'pre_test_full_state_list', 'seq_size', 'test_loader', 'train_loader']
         self.action_encoder = payload["action_encoder"]
         self.args = payload["args"]
         self.b_idx = payload["b_idx"]
@@ -614,6 +627,7 @@ class Workspace:
         self.test_loader = payload["test_loader"]
         self.train_loader = payload["train_loader"]
         self.output_normal = payload["output_normal"]
+        self.uid = payload["uid"]
         
 
     

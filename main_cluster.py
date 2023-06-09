@@ -9,13 +9,15 @@ from cluster import exit_for_resume, read_params_from_cmdline, save_metrics_para
 
 def main():
     params = read_params_from_cmdline()
-    workspace = Workspace(params)
     # check if the path already exists
+    resume = False
     name = params["name"]
     snapshot_dir = Path(f"/home/fmohamed/love_snapshots_{name}")
     snapshot = snapshot_dir / f'snapshot_latest.pt'
     if os.path.exists(snapshot):
         workspace.load_snapshot()
+        resume = True
+    workspace = Workspace(params, resume)
     exitcode = workspace.main()
     if exitcode == 3:
         return exit_for_resume()
