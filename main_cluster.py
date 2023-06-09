@@ -12,7 +12,8 @@ def main():
     # check if the path already exists
     resume = False
     name = params["name"]
-    snapshot_dir = Path(f"/home/fmohamed/love_snapshots_{name}")
+    seed = params["seed"]
+    snapshot_dir = Path(f"/home/fmohamed/love_snapshots_{name}_seed_{seed}")
     snapshot = snapshot_dir / f'snapshot_latest.pt'
     print(f"snapshot_dir:{snapshot}")
     if os.path.exists(snapshot):

@@ -585,7 +585,8 @@ class Workspace:
     def save_snapshot(self, suffix):
         # _suffix = suffix
         name = self.args["name"]
-        snapshot_dir = Path(f"/home/fmohamed/love_snapshots_{name}")
+        seed = self.args["seed"]
+        snapshot_dir = Path(f"/home/fmohamed/love_snapshots_{name}_seed_{seed}")
         snapshot_dir.mkdir(exist_ok=True, parents=True)
         snapshot = snapshot_dir / f'snapshot_latest.pt'
         # self.last_current_size = self.replay_storage.current_size
@@ -600,7 +601,8 @@ class Workspace:
     def load_snapshot(self):
         print(f"Loading snapshot")
         name = self.args["name"]
-        snapshot_dir = Path(f"/home/fmohamed/love_snapshots_{name}")
+        seed = self.args["seed"]
+        snapshot_dir = Path(f"/home/fmohamed/love_snapshots_{name}_seed_{seed}")
         snapshot = snapshot_dir / f'snapshot_latest.pt'
         with snapshot.open('rb') as f:
             payload = torch.load(f)
