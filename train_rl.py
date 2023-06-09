@@ -570,11 +570,10 @@ class Workspace:
                 wandb.log({"fps": run_time}, step=b_idx)
                 if ((time.time() - start_time) / 60) > self.args["max_runtime"]:
                     self.save_snapshot(f"_{b_idx}")
-                    display.stop()
 
     def save_snapshot(self, suffix):
         _suffix = suffix
-        snapshot_dir = Path.cwd()
+        snapshot_dir = Path("/home/fmohamed/love_snapshots")
         snapshot_dir.mkdir(exist_ok=True, parents=True)
         snapshot = snapshot_dir / f'snapshot_{_suffix}.pt'
         # self.last_current_size = self.replay_storage.current_size
