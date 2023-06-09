@@ -181,32 +181,24 @@ class Workspace:
         # device = torch.device("cpu")
 
         # set writer
-        exp_name = set_exp_name(self.args)
+        self.exp_name = set_exp_name(self.args)
 
 
         # generate an id to resume
         if resume:
-            self.load_snapshot()
-            wandb.init(
-                id = self.uid,
-                resume="must",
-                project="love",
-                name=exp_name,
-                sync_tensorboard=False,
-                settings=wandb.Settings(start_method="fork"),
-            )
+            pass
         else:
             self.uid = wandb.util.generate_id()
             wandb.init(
                 id = self.uid,
                 resume="allow",
                 project="love",
-                name=exp_name,
+                name=self.exp_name,
                 sync_tensorboard=False,
                 settings=wandb.Settings(start_method="fork"),
             )
 
-        LOGGER.info("EXP NAME: " + exp_name)
+        LOGGER.info("EXP NAME: " + self.exp_name)
         LOGGER.info(">" * 80)
         LOGGER.info(self.args)
         LOGGER.info(">" * 80)
@@ -602,7 +594,7 @@ class Workspace:
         payload = {k: self.__dict__[k] for k in keys_to_save}
         with snapshot.open('wb') as f:
             torch.save(payload, f)
-            # wandb.save(str(snapshot)) # saves checkpoint to wandb
+            wandb.save(str(snapshot)) # saves checkpoint to wandb
 
     def load_snapshot(self):
         print(f"Loading snapshot")
@@ -631,6 +623,15 @@ class Workspace:
         self.output_normal = payload["output_normal"]
         self.uid = payload["uid"]
         self.run_time = payload["run_time"]
+        self.load_snapshot()
+        wandb.init(
+            id = self.uid,
+            resume="must",
+            project="love",
+            name=self.exp_name,
+            sync_tensorboard=False,
+            settings=wandb.Settings(start_method="fork"),
+        )
         
 
     
