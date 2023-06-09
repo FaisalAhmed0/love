@@ -279,9 +279,6 @@ def main(params=None):
     b_idx = 0
     start_time = time.time()
     while b_idx <= args["max_iters"]:
-        # for each batch
-        if (time.time() - start_time) / 60 > args["max_runtime"]:    
-            print("I am here")
         for train_obs_list, train_action_list in train_loader:
             b_idx += 1
             # mask temp annealing
@@ -322,6 +319,7 @@ def main(params=None):
                 grad_norm = nn.utils.clip_grad_norm_(
                     model.parameters(), args["grad_clip"], error_if_nonfinite=True)
             optimizer.step()
+            
 
             # log
             if b_idx % 5 == 0:
@@ -532,7 +530,9 @@ def main(params=None):
                     )
                     LOGGER.info(log_str, *log_data)
                     wandb.log(test_stats, step=b_idx)
-
+                    
+            if (time.time() - start_time) / 60 > args["max_runtime"]:    
+                print("I am here")
 
 if __name__ == "__main__":
     main()
