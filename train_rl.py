@@ -580,7 +580,7 @@ class Workspace:
         # self.last_current_size = self.replay_storage.current_size
         keys_to_save = ['action_encoder', 'args', 'b_idx', 'cmd_args', 'decoder', 'device', 
                         'encoder', 'init_size', 'model', 'optimizer', 'output_normal', 'params',
-                        'pre_test_full_action_list', 'pre_test_full_state_list', 'save_snapshot', 'seq_size', 'test_loader', 'train_loader']
+                        'pre_test_full_action_list', 'pre_test_full_state_list', 'seq_size', 'test_loader', 'train_loader']
         payload = {k: self.__dict__[k] for k in keys_to_save}
         with snapshot.open('wb') as f:
             torch.save(payload, f)
