@@ -1,32 +1,29 @@
-from pyvirtualdisplay import Display
-display = Display(visible=0, size=(1400, 900))
-display.start()
-import argparse
-import sys
-import os
-import logging
-import numpy as np
-import torch
-import torch.nn as nn
-from torch.optim import Adam
-from grid_world import grid
-from gym_miniworld import miniworld
-from world3d import world3d
-from pathlib import Path
-
-from gym_miniworld import miniworld
-from world3d import world3d
-
-from hssm_rl import EnvModel
-import utils
-import modules
+import wandb
+import time
+from datetime import datetime
 from modules import (
     GridDecoder,
     GridActionEncoder,
 )
-from datetime import datetime
-import time
-import wandb
+import modules
+import utils
+from hssm_rl import EnvModel
+from pathlib import Path
+from world3d import world3d
+from gym_miniworld import miniworld
+from grid_world import grid
+from torch.optim import Adam
+import torch.nn as nn
+import torch
+import numpy as np
+import logging
+import os
+import sys
+import argparse
+from pyvirtualdisplay import Display
+display = Display(visible=0, size=(1400, 900))
+display.start()
+
 
 LOGGER = logging.getLogger(__name__)
 os.environ['PYOPENGL_PLATFORM'] = 'egl'
@@ -35,15 +32,15 @@ os.environ['PYOPENGL_PLATFORM'] = 'egl'
 def parse_args():
 
     defualt_params = {
-        "wandb" : True,
-        "seed" : 1,
-        "name" : "st",
+        "wandb": True,
+        "seed": 1,
+        "name": "st",
 
         # data size
-        "dataset_path":"./data/demos",
+        "dataset_path": "./data/demos",
         "batch_size": 128,
-        "seq-size" : 6,
-        "init_size":1,
+        "seq-size": 6,
+        "init_size": 1,
 
         # model size
         "state_size": 8,
@@ -79,8 +76,8 @@ def parse_args():
         "coding_len_coeff": 1.0,
         "use_min_length_boundary_mask": True,
 
-        "action_type": "d", # d for discrete, c for continuous
-        
+        "action_type": "d",  # d for discrete, c for continuous
+
 
         # baselines
         "ddo": False,
@@ -159,10 +156,10 @@ class Workspace:
         if self.cmd_args:
             for key in self.cmd_args:
                 self.args[key] = self.cmd_args[key]
-        self.params =  self.args
+        self.params = self.args
         if not self.args["wandb"]:
             os.environ["WANDB_MODE"] = "offline"
-        
+
         # fix seed
         np.random.seed(self.args["seed"])
         torch.manual_seed(self.args["seed"])
@@ -171,7 +168,8 @@ class Workspace:
 
         # set logger
         log_format = "[%(asctime)s] %(message)s"
-        logging.basicConfig(level=logging.INFO, format=log_format, stream=sys.stderr)
+        logging.basicConfig(level=logging.INFO,
+                            format=log_format, stream=sys.stderr)
 
         # set size
         self.init_size = self.args["init_size"]
@@ -197,14 +195,16 @@ class Workspace:
 
         # load dataset
         if "compile" in self.args["dataset_path"]:
-            self.train_loader, self.test_loader = utils.compile_loader(self.args["batch_size"])
+            self.train_loader, self.test_loader = utils.compile_loader(
+                self.args["batch_size"])
             # action encdoer given the trajectory
             self.action_encoder = GridActionEncoder(
                 action_size=self.train_loader.dataset.action_size,
                 embedding_size=self.args["belief_size"],
             )
             # observation encdoer given the trajectory
-            self.encoder = modules.CompILEGridEncoder(feat_size=self.args["belief_size"])
+            self.encoder = modules.CompILEGridEncoder(
+                feat_size=self.args["belief_size"])
             # observation decoder for recounstructing the observation given the state abstraction
             self.decoder = GridDecoder(
                 input_size=self.args["belief_size"],
@@ -213,7 +213,8 @@ class Workspace:
             )
             self.output_normal = True
         elif "miniworld" in self.args["dataset_path"]:
-            self.train_loader, self.test_loader = utils.miniworld_loader(self.args["batch_size"])
+            self.train_loader, self.test_loader = utils.miniworld_loader(
+                self.args["batch_size"])
             self.action_encoder = GridActionEncoder(
                 action_size=self.train_loader.dataset.action_size,
                 embedding_size=self.args["belief_size"],
@@ -225,9 +226,10 @@ class Workspace:
                 feat_size=self.args["belief_size"],
             )
             self.output_normal = False
-        
+
         elif "d4rl" in self.args["dataset_path"]:
-            self.train_loader, self.test_loader = utils.d4rl_loader(self.args["batch_size"], self.args["name"])
+            self.train_loader, self.test_loader = utils.d4rl_loader(
+                self.args["batch_size"], self.args["name"])
             self.action_encoder = modules.D4RLActionEncoder(
                 action_size=self.train_loader.dataset.action_size,
                 embedding_size=self.args["belief_size"],
@@ -264,18 +266,22 @@ class Workspace:
             coding_len_coeff=self.args["coding_len_coeff"],
             use_min_length_boundary_mask=self.args["use_min_length_boundary_mask"],
             ddo=self.args["ddo"],
-            output_normal=self.output_normal, 
-            action_type = self.args["action_type"]
+            output_normal=self.output_normal,
+            action_type=self.args["action_type"]
         ).to(self.device)
         LOGGER.info("Model initialized")
 
         # init optimizer
-        self.optimizer = Adam(params=self.model.parameters(), lr=self.args["learn_rate"], amsgrad=True)
+        self.optimizer = Adam(params=self.model.parameters(),
+                              lr=self.args["learn_rate"], amsgrad=True)
 
         # test data
-        self.pre_test_full_state_list, self.pre_test_full_action_list =  next(iter(self.test_loader))
-        self.pre_test_full_state_list = self.pre_test_full_state_list.to(self.device)
-        self.pre_test_full_action_list = self.pre_test_full_action_list.to(self.device)
+        self.pre_test_full_state_list, self.pre_test_full_action_list = next(
+            iter(self.test_loader))
+        self.pre_test_full_state_list = self.pre_test_full_state_list.to(
+            self.device)
+        self.pre_test_full_action_list = self.pre_test_full_action_list.to(
+            self.device)
 
         # for each iter
         torch.autograd.set_detect_anomaly(False)
@@ -305,7 +311,8 @@ class Workspace:
                 self.model.train()
                 self.optimizer.zero_grad()
                 results = self.model(
-                    train_obs_list, train_action_list, self.seq_size, self.init_size, self.args["obs_std"]
+                    train_obs_list, train_action_list, self.seq_size, self.init_size, self.args[
+                        "obs_std"]
                 )
 
                 if self.args["coding_len_coeff"] > 0:
@@ -314,8 +321,10 @@ class Workspace:
                     elif b_idx > 0:
                         self.model.coding_len_coeff -= 0.00002
 
-                    self.model.coding_len_coeff = min(0.05, self.model.coding_len_coeff)
-                    self.model.coding_len_coeff = max(0.000000, self.model.coding_len_coeff)
+                    self.model.coding_len_coeff = min(
+                        0.05, self.model.coding_len_coeff)
+                    self.model.coding_len_coeff = max(
+                        0.000000, self.model.coding_len_coeff)
                     results["coding_len_coeff"] = self.model.coding_len_coeff
 
                 # get train loss and backward update
@@ -325,35 +334,39 @@ class Workspace:
                     grad_norm = nn.utils.clip_grad_norm_(
                         self.model.parameters(), self.args["grad_clip"], error_if_nonfinite=True)
                 self.optimizer.step()
-                
 
                 # log
                 if b_idx % 5 == 0:
                     results["grad_norm"] = grad_norm
-                    train_stats, log_str, log_data = utils.log_train(results, None, b_idx)
+                    train_stats, log_str, log_data = utils.log_train(
+                        results, None, b_idx)
                     if not "d4rl" in self.params["dataset_path"]:
                         # Boundaries for grid world
-                        true_boundaries = train_action_list[:, self.init_size:-self.init_size] == 4
+                        true_boundaries = train_action_list[:,
+                                                            self.init_size:-self.init_size] == 4
                         true_boundaries = torch.roll(true_boundaries, 1, -1)
                         true_boundaries[:, 0] = True
                         correct_boundaries = torch.logical_and(
-                            results["mask_data"].squeeze(-1) == true_boundaries, true_boundaries
+                            results["mask_data"].squeeze(
+                                -1) == true_boundaries, true_boundaries
                         ).sum()
                         num_pred_boundaries = results["mask_data"].sum()
                         num_true_boundaries = true_boundaries.sum()
                         train_stats["train/precision"] = (
                             correct_boundaries / num_pred_boundaries
                         )
-                        train_stats["train/recall"] = correct_boundaries / num_true_boundaries
+                        train_stats["train/recall"] = correct_boundaries / \
+                            num_true_boundaries
 
                         LOGGER.info(log_str, *log_data)
                     wandb.log(train_stats, step=b_idx)
 
                 np.set_printoptions(threshold=100000)
                 torch.set_printoptions(threshold=100000)
-                
+
                 if b_idx % 200 == 0:
-                    exp_dir = os.path.join("/home/fmohamed/love_experiments", self.args["name"], str(b_idx))
+                    exp_dir = os.path.join(
+                        "/home/fmohamed/love_experiments", self.args["name"], str(b_idx))
                     os.makedirs(exp_dir, exist_ok=True)
                     for batch_idx in range(min(train_obs_list.shape[0], 10)):
                         states = train_obs_list[batch_idx][self.init_size:-self.init_size]
@@ -378,9 +391,11 @@ class Workspace:
                                     ################################################
                                     f = []
                                     for i in range(5):
-                                        f.append(states[seq_idx][:, :, i * 3 : (i + 1) * 3])
+                                        f.append(
+                                            states[seq_idx][:, :, i * 3: (i + 1) * 3])
                                     frame = torch.cat(f[::-1], axis=1)
-                                    frame = world3d.Render(frame.cpu().data.numpy())
+                                    frame = world3d.Render(
+                                        frame.cpu().data.numpy())
                                     frame.write_text(
                                         f"Action: {repr(miniworld.MiniWorldEnv.Actions(actions[seq_idx].item()))}")
                                     frame.write_text(
@@ -410,7 +425,8 @@ class Workspace:
                                     for x in range(10):
                                         for y in range(10):
                                             obj = np.argmax(
-                                                states[seq_idx][x][y].cpu().data.numpy()
+                                                states[seq_idx][x][y].cpu(
+                                                ).data.numpy()
                                             )
                                             if (
                                                 obj == grid.ComPILEObject.num_types()
@@ -419,11 +435,13 @@ class Workspace:
                                                 ]
                                             ):
                                                 frame.draw_rectangle(
-                                                    np.array((x, y)), 0.9, "cyan"
+                                                    np.array(
+                                                        (x, y)), 0.9, "cyan"
                                                 )
                                             elif obj == grid.ComPILEObject.num_types() + 1:
                                                 frame.draw_rectangle(
-                                                    np.array((x, y)), 0.7, "black"
+                                                    np.array(
+                                                        (x, y)), 0.7, "black"
                                                 )
                                             elif states[seq_idx][x][y][obj] == 1:
                                                 frame.draw_rectangle(
@@ -448,8 +466,10 @@ class Workspace:
                                     #  End of compile specific
                                     ################################################
                                 frame.write_text(f"Option: {curr_option}")
-                                frame.write_text(f"Boundary: {boundaries[seq_idx].item()}")
-                                frame.write_text(f"Obs NLL: {results['obs_cost'].mean()}")
+                                frame.write_text(
+                                    f"Boundary: {boundaries[seq_idx].item()}")
+                                frame.write_text(
+                                    f"Obs NLL: {results['obs_cost'].mean()}")
                                 frame.write_text(
                                     f"Coding length: {results['encoding_length'].item()}"
                                 )
@@ -458,7 +478,8 @@ class Workspace:
                                 )
                                 frames.append(frame.image())
 
-                            save_path = os.path.join(exp_dir, f"{batch_idx}.gif")
+                            save_path = os.path.join(
+                                exp_dir, f"{batch_idx}.gif")
                             frames[0].save(
                                 save_path,
                                 save_all=True,
@@ -474,11 +495,13 @@ class Workspace:
                     LOGGER.info(">>> option list")
                     LOGGER.info("\n" + repr(results["option_list"][:10]))
                     LOGGER.info(">>> boundary mask list")
-                    LOGGER.info("\n" + repr(results["mask_data"][:10].squeeze(-1)))
+                    LOGGER.info(
+                        "\n" + repr(results["mask_data"][:10].squeeze(-1)))
                     LOGGER.info(">>> train_action_list")
                     LOGGER.info("\n" + repr(train_action_list[:10]))
                     LOGGER.info(">>> argmax reconstruction")
-                    LOGGER.info("\n" + repr(torch.argmax(results["rec_data"], -1)[:10]))
+                    LOGGER.info(
+                        "\n" + repr(torch.argmax(results["rec_data"], -1)[:10]))
                     LOGGER.info(">>> diff")
                     LOGGER.info(
                         "\n"
@@ -494,7 +517,8 @@ class Workspace:
                 if b_idx % 2000 == 0:
                     exp_dir = os.path.join("experiments", self.args["name"])
                     torch.save(
-                        self.model.state_model, os.path.join(exp_dir, f"model-{b_idx}.ckpt")
+                        self.model.state_model, os.path.join(
+                            exp_dir, f"model-{b_idx}.ckpt")
                     )
 
                 #############
@@ -515,15 +539,18 @@ class Workspace:
                         )
 
                         # log
-                        test_stats, log_str, log_data = utils.log_test(results, None, b_idx)
+                        test_stats, log_str, log_data = utils.log_test(
+                            results, None, b_idx)
                         # Boundaries for grid world
                         true_boundaries = (
-                            self.pre_test_full_action_list[:, self.init_size:-self.init_size] == 4
+                            self.pre_test_full_action_list[:,
+                                                           self.init_size:-self.init_size] == 4
                         )
                         true_boundaries = torch.roll(true_boundaries, 1, -1)
                         true_boundaries[:, 0] = True
                         correct_boundaries = torch.logical_and(
-                            results["mask_data"].squeeze(-1) == true_boundaries,
+                            results["mask_data"].squeeze(
+                                -1) == true_boundaries,
                             true_boundaries,
                         ).sum()
                         num_pred_boundaries = results["mask_data"].sum()
@@ -537,24 +564,23 @@ class Workspace:
                         LOGGER.info(log_str, *log_data)
                         wandb.log(test_stats, step=b_idx)
                 run_time = (time.time() - start_time) / 60
-                wandb.log({"fps": run_time}, step=b_idx)        
-                if ((time.time() - start_time) / 60) > self.args["max_runtime"]:    
+                wandb.log({"fps": run_time}, step=b_idx)
+                if ((time.time() - start_time) / 60) > self.args["max_runtime"]:
                     self.save_snapshot(f"_{b_idx}")
-    
-    
+
     def save_snapshot(self, suffix):
         _suffix = suffix
         snapshot_dir = Path.cwd()
         snapshot_dir.mkdir(exist_ok=True, parents=True)
         snapshot = snapshot_dir / f'snapshot_{_suffix}.pt'
         # self.last_current_size = self.replay_storage.current_size
-        keys_to_save = [k for k in dir(self) if (("__" not in k) and( "main" not in k))]
-        print(f"snapshot directory: {keys_to_save}")
+        keys_to_save = ['action_encoder', 'args', 'b_idx', 'cmd_args', 'decoder', 'device', 
+                        'encoder', 'init_size', 'model', 'optimizer', 'output_normal', 'params',
+                        'pre_test_full_action_list', 'pre_test_full_state_list', 'save_snapshot', 'seq_size', 'test_loader', 'train_loader']
         payload = {k: self.__dict__[k] for k in keys_to_save}
         with snapshot.open('wb') as f:
             torch.save(payload, f)
             # wandb.save(str(snapshot)) # saves checkpoint to wandb
-
 
 
 if __name__ == "__main__":
