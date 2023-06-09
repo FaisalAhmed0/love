@@ -539,7 +539,7 @@ class Workspace:
                 run_time = (time.time() - start_time) / 60
                 wandb.log({"fps": run_time}, step=b_idx)        
                 if ((time.time() - start_time) / 60) > self.args["max_runtime"]:    
-                    self.save_snapshot()
+                    self.save_snapshot(f"_{b_idx}")
     
     
     def save_snapshot(self, suffix):
