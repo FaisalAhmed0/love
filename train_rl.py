@@ -83,6 +83,9 @@ def parse_args():
 
         # baselines
         "ddo": False,
+
+        # max runtime in the cluster
+        "max_runtime": 5
     }
     return defualt_params
     # parser = argparse.ArgumentParser(description="vta agr parser")
@@ -277,7 +280,8 @@ def main(params=None):
     start_time = time.time()
     while b_idx <= args["max_iters"]:
         # for each batch
-        print("Outside of the batch loop")
+        if (time.time() - start_time) / 60 > args["max_runtime"]:    
+            print("I am here")
         for train_obs_list, train_action_list in train_loader:
             b_idx += 1
             # mask temp annealing
