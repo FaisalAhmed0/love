@@ -84,7 +84,7 @@ def parse_args():
         "ddo": False,
 
         # max runtime in the cluster
-        "max_runtime": 2
+        "max_runtime": 1
     }
     return defualt_params
     # parser = argparse.ArgumentParser(description="vta agr parser")
