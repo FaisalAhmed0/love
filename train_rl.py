@@ -531,7 +531,7 @@ def main(params=None):
                     LOGGER.info(log_str, *log_data)
                     wandb.log(test_stats, step=b_idx)
             run_time = (time.time() - start_time) / 60
-            wandb.log(run_time, step=b_idx)        
+            wandb.log({"run_time": run_time}, step=b_idx)        
             if (time.time() - start_time) / 60 > args["max_runtime"]:    
                 print("I am here")
 
