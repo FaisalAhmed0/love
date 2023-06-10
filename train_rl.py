@@ -525,12 +525,15 @@ class Workspace:
                     LOGGER.info("\n" + repr(results["marginal"]))
                     LOGGER.info("#" * 80)
 
-                if b_idx % 2000 == 0:
-                    exp_dir = os.path.join("experiments", self.args["name"])
-                    # torch.save(
-                    #     self.model.state_model, os.path.join(a
-                    #         exp_dir, f"model-{b_idx}.ckpt")
-                    # )
+                if b_idx % 10 == 0:
+                    name = self.args["name"]
+                    seed = self.args["seed"]
+                    exp_dir = os.path.join("experiments", f"{name}_seed_{seed}")
+                    exp_dir.mkdir(exist_ok=True, parents=True)
+                    torch.save(
+                        self.model.state_model, os.path.join(
+                            exp_dir, f"model-{b_idx}.ckpt")
+                    )
 
                 #############
                 # test time #
