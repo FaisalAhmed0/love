@@ -1,6 +1,6 @@
 {
-    "optimization_procedure_name": "love_test_grid_world",
-    "results_dir": "/fast/fmohamed/love_test_grid_world",
+    "optimization_procedure_name": "love_test_d4rl",
+    "results_dir": "/fast/fmohamed/love_test_d4rl",
     "git_params": {
       "branch": "main",
       "commit": null
