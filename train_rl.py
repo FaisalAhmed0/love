@@ -558,27 +558,29 @@ class Workspace:
                         test_stats, log_str, log_data = utils.log_test(
                             results, None, b_idx)
                         # Boundaries for grid world
-                        true_boundaries = (
-                            self.pre_test_full_action_list[:,
-                                                           self.init_size:-self.init_size] == 4
-                        )
-                        true_boundaries = torch.roll(true_boundaries, 1, -1)
-                        true_boundaries[:, 0] = True
-                        correct_boundaries = torch.logical_and(
-                            results["mask_data"].squeeze(
-                                -1) == true_boundaries,
-                            true_boundaries,
-                        ).sum()
-                        num_pred_boundaries = results["mask_data"].sum()
-                        num_true_boundaries = true_boundaries.sum()
-                        test_stats["valid/precision"] = (
-                            correct_boundaries / num_pred_boundaries
-                        )
-                        test_stats["valid/recall"] = (
-                            correct_boundaries / num_true_boundaries
-                        )
-                        LOGGER.info(log_str, *log_data)
-                        wandb.log(test_stats, step=b_idx)
+                        if not "d4rl" in self.params["dataset_path"]:
+                            true_boundaries = (
+                                self.pre_test_full_action_list[:,
+                                                            self.init_size:-self.init_size] == 4
+                            )
+                            true_boundaries = torch.roll(true_boundaries, 1, -1)
+                            true_boundaries[:, 0] = True
+                            
+                            correct_boundaries = torch.logical_and(
+                                results["mask_data"].squeeze(
+                                    -1) == true_boundaries,
+                                true_boundaries,
+                            ).sum()
+                            num_pred_boundaries = results["mask_data"].sum()
+                            num_true_boundaries = true_boundaries.sum()
+                            test_stats["valid/precision"] = (
+                                correct_boundaries / num_pred_boundaries
+                            )
+                            test_stats["valid/recall"] = (
+                                correct_boundaries / num_true_boundaries
+                            )
+                            LOGGER.info(log_str, *log_data)
+                            wandb.log(test_stats, step=b_idx)
                 self.run_time = (time.time() - start_time) / 60
                 wandb.log({"train/run_time": self.run_time}, step=b_idx)
                 if ((time.time() - start_time) / 60) > self.args["max_runtime"]:
