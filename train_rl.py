@@ -525,7 +525,7 @@ class Workspace:
                     LOGGER.info("\n" + repr(results["marginal"]))
                     LOGGER.info("#" * 80)
 
-                if b_idx % 10 == 0:
+                if b_idx % 2000 == 0:
                     name = self.args["name"]
                     seed = self.args["seed"]
                     base_path = "/home/fmohamed/"
