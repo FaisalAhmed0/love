@@ -528,11 +528,11 @@ class Workspace:
                 if b_idx % 10 == 0:
                     name = self.args["name"]
                     seed = self.args["seed"]
-                    exp_dir = os.path.join("experiments", f"{name}_seed_{seed}")
+                    exp_dir = Path(os.path.join("experiments", f"{name}_seed_{seed}"))
                     exp_dir.mkdir(exist_ok=True, parents=True)
                     torch.save(
                         self.model.state_model, os.path.join(
-                            exp_dir, f"model-{b_idx}.ckpt")
+                            str(exp_dir), f"model-{b_idx}.ckpt")
                     )
 
                 #############
