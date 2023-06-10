@@ -56,7 +56,7 @@
       },
       {
         "param": "use_min_length_boundary_mask",
-        "values": ["use_min_length_boundary_mask"]
+        "values": [true]
       },
       {
         "param": "latent_n",
