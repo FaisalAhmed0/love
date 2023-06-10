@@ -514,13 +514,14 @@ class Workspace:
                     LOGGER.info(
                         "\n" + repr(torch.argmax(results["rec_data"], -1)[:10]))
                     LOGGER.info(">>> diff")
-                    LOGGER.info(
-                        "\n"
-                        + repr(
-                            train_action_list[:10, 1:-1]
-                            - torch.argmax(results["rec_data"][:10], -1)
+                    if not "d4rl" in self.params["dataset_path"]:
+                        LOGGER.info(
+                            "\n"
+                            + repr(
+                                train_action_list[:10, 1:-1]
+                                - torch.argmax(results["rec_data"][:10], -1)
+                            )
                         )
-                    )
                     LOGGER.info(">>> marginal")
                     LOGGER.info("\n" + repr(results["marginal"]))
                     LOGGER.info("#" * 80)
