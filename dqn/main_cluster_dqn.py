@@ -14,14 +14,8 @@ def main_cluster():
     with open("/home/fmohamed/love/cluster_settings/cfg_finetune.json") as f:
         all_parma = json.load(f)
     print(f"all_parma:{all_parma}")
-    params = read_params_from_cmdline()
-    try:
-        params["config_bindings"] = all_parma["config_bindings"]
-    except Exception as error:
-        print(f"error:{error}")
-        quit()
-    print(f"params:{params}")
-    exitcode = main(params)
+    hyperparams = read_params_from_cmdline()
+    exitcode = main(hyperparams, all_parma["config_bindings"])
     if exitcode == 3:
         return exit_for_resume()
     else:
