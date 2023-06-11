@@ -82,7 +82,7 @@
       },
       {
         "param": "max_runtime",
-        "values": [3]
+        "values": [90]
       }
     ]
   }
