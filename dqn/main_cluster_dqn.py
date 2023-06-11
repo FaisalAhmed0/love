@@ -13,6 +13,7 @@ import json
 def main_cluster():
     with open("/home/fmohamed/love/cluster_settings/cfg_finetune.json") as f:
         all_parma = json.load(f)
+    print(f"all_parma:{all_parma}")
     params = read_params_from_cmdline()
     params["config_bindings"] = all_parma["config_bindings"]
     print(f"params:{params}")
