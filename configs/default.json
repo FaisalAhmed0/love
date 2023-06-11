@@ -72,7 +72,7 @@
     },
     {
       "param": "checkpoint",
-      "values":["none"]
+      "values":["/home/fmohamed/checkpoints"]
     },
     {
       "param": "force_overwrite",
