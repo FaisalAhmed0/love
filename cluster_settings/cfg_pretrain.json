@@ -1,6 +1,6 @@
 {
-    "optimization_procedure_name": "love_gridworld",
-    "results_dir": "/fast/fmohamed/love_gridworld",
+    "optimization_procedure_name": "love_baseline_d4rlmaze",
+    "results_dir": "/fast/fmohamed/love_baseline_d4rlmaze",
     "git_params": {
       "branch": "main",
       "commit": null
@@ -38,7 +38,7 @@
       },
       {
         "param": "name",
-        "values": ["grid_world_love"]
+        "values": ["maze2d-open-v0"]
       },
       {
         "param": "coding_len_coeff",
@@ -58,7 +58,7 @@
       },
       {
         "param": "dataset_path",
-        "values": ["compile"]
+        "values": ["d4rl"]
       },
       {
         "param": "max_iters",
@@ -78,11 +78,11 @@
       },
       {
         "param": "action_type",
-        "values": ["d"]
+        "values": ["c"]
       },
       {
         "param": "max_runtime",
-        "values": [90]
+        "values": [3]
       }
     ]
   }
