@@ -106,7 +106,7 @@ class RecurrentStateEmbedder(Embedder):
         return embeddings, detached_hidden_state
 
 
-import modules
+from ... import modules
 class StateDependentEmbedder(Embedder):
     def __init__(self, embed_dim, feat_size=64):
         super().__init__(embed_dim)
