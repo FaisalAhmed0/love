@@ -38,7 +38,7 @@
       },
       {
         "param": "name",
-        "values": ["maze2d-open-v0"]
+        "values": ["grid_world_love"]
       },
       {
         "param": "coding_len_coeff",
@@ -78,7 +78,7 @@
       },
       {
         "param": "action_type",
-        "values": ["c"]
+        "values": ["d"]
       },
       {
         "param": "max_runtime",
