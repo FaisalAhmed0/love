@@ -110,15 +110,15 @@ def main(params=None, config_bindings=None):
             args[key] = params[key]
     name = args["exp_name"]
     print(f"name: {name}")
-    try:
-        if config_bindings:
-            args["config_bindings"]  = config_bindings
-        assert args["exp_name"] is not None
-        config = cfg.Config.from_files_and_bindings(
-                args["configs"], args["config_bindings"])
-    except Exception as error:
-        print(f"error:{error}")
-        quit()
+    # try:
+    if config_bindings:
+        args["config_bindings"]  = config_bindings
+    assert args["exp_name"] is not None
+    config = cfg.Config.from_files_and_bindings(
+            args["configs"], args["config_bindings"])
+    # except Exception as error:
+    #     print(f"error:{error}")
+    #     quit()
 
     
     np.random.seed(args["seed"])

@@ -30,7 +30,7 @@
         "visit_length=3",
         "bc=False",
         "oracl=False",
-        "env=compile\\"
+        "env=compile"
     ],
   "hyperparam_list":[
     {
