@@ -22,6 +22,7 @@
     "min_buffer_size": 500,
     "batch_size": 32,
     "update_freq": 4,
-    "max_grad_norm": 10
+    "max_grad_norm": 10,
+    "action_type": "d"
   }
 }
