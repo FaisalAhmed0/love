@@ -5,6 +5,16 @@
       "branch": "main",
       "commit": null
     },
+    "num_best_jobs_whose_data_is_kept": 5,
+    "optimizer_str": "cem",
+    "optimizer_settings": {
+      "with_restarts": true,
+      "num_jobs_in_elite": 10
+    },
+    "optimization_setting":{
+      "number_of_samples": 1,
+      "n_jobs_per_iteration": 1
+    },
     "script_relative_path": "main_cluster.py",
     "remove_jobs_dir": false,
     "environment_setup": {},
@@ -29,7 +39,7 @@
       },
       {
         "param": "name",
-        "values": ["maze2d-open-v0", "c"]
+        "values": ["maze2d-open-v0"]
       },
       {
         "param": "coding_len_coeff",
