@@ -22,7 +22,12 @@
         "test_resume": false,
         "pre_training": false
   },
-  "hyperparam_list":[  
+  "hyperparam_list":[
+    {
+      "param": "configs",
+      "values":[["configs/default.json", "love_grid_world"]]
+    },
+    
     {
       "param": "base_dir",
       "values":["experiments"]
