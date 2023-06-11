@@ -18,7 +18,7 @@ from grid_world import grid
 import option_wrapper
 import rl
 import utils
-from world3d import world3d
+# from world3d import world3d
 import wandb
 
 
@@ -159,14 +159,14 @@ def main(params=None):
         train_loader = utils.compile_loader(100)[0]
         hssm.post_obs_state._output_normal = True
         hssm._output_normal = True
-    elif config.get("env") == "3d":
-        env = world3d.MultiTask3DEnv(
-                seed=1, num_objects=4, visit_length=4, max_episode_steps=75,
-                sparse_reward=config.get("sparse_reward"))
-        env = world3d.PanoramaObservationWrapper(env)
-        train_loader = utils.miniworld_loader(100)[0]
-        hssm.post_obs_state._output_normal = False
-        hssm._output_normal = False
+    # elif config.get("env") == "3d":
+    #     env = world3d.MultiTask3DEnv(
+    #             seed=1, num_objects=4, visit_length=4, max_episode_steps=75,
+    #             sparse_reward=config.get("sparse_reward"))
+    #     env = world3d.PanoramaObservationWrapper(env)
+    #     train_loader = utils.miniworld_loader(100)[0]
+    #     hssm.post_obs_state._output_normal = False
+    #     hssm._output_normal = False
     else:
         raise ValueError()
 
