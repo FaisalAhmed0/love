@@ -145,7 +145,7 @@ def date_str():
 
 
 def set_exp_name(args):
-    exp_name = args["name"] + "__seed__" +args['seed'] + "_" + date_str()
+    exp_name = args["name"] + "__seed__" + str(args['seed']) + "_" + date_str()
     return exp_name
 
 
