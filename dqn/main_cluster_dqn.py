@@ -6,7 +6,7 @@ from train_rl import Workspace
 from dqn import main
 from cluster import exit_for_resume, read_params_from_cmdline, save_metrics_params
 
-os.environ['PYTHONPATH'] = '/home/fmohamed/love'
+# os.environ['PYTHONPATH'] = '/home/fmohamed/love'
 
 
 def main_cluster():
