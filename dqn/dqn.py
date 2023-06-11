@@ -13,7 +13,7 @@ import gym
 from torch.nn import functional as F
 import tqdm
 from grid_world import grid
-from world3d import world3d
+# from world3d import world3d
 
 '''TODO: For the DQNAgent class you should add the following:
         - An optimizer for the actor in the continous actions case (from_config method)
@@ -196,9 +196,9 @@ class DQNPolicy(nn.Module):
             if isinstance(env.unwrapped, grid.ComPILEEnv):
                 state_embedder = embed.CompILEEmbedder(
                         embedder_config.get("embed_dim"))
-            elif isinstance(env.unwrapped, world3d.MultiTask3DEnv):
-                state_embedder = embed.World3DEmbedder(
-                        embedder_config.get("embed_dim"))
+            # elif isinstance(env.unwrapped, world3d.MultiTask3DEnv):
+            #     state_embedder = embed.World3DEmbedder(
+            #             embedder_config.get("embed_dim"))
             elif isinstance(env, gym.wrappers.time_limit.TimeLimit):
                 state_embedder = embed.IdentityEmbedder(embedder_config.get("embed_dim"))
                 action_embedder = embed.IdentityEmbedder(embedder_config.get("embed_dim"))
