@@ -28,7 +28,7 @@ class DQNAgent(object):
         dqn = DQNPolicy.from_config(config.get("policy"), env)
         replay_buffer = replay.ReplayBuffer.from_config(config.get("buffer"))
         optimizer = optim.Adam(dqn.parameters(), lr=config.get("learning_rate"))
-        if config.get("policy").get("action_type"):
+        if config.get("policy").get("action_type") == "c":
             actor_optimizer = optim.Adam(dqn.continuous_actor.parameters(), lr=config.get("learning_rate"))
         return cls(dqn, replay_buffer, optimizer, actor_optimizer, config.get("sync_target_freq"),
                    config.get("min_buffer_size"), config.get("batch_size"),
