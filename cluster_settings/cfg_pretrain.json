@@ -24,6 +24,10 @@
       },    
     "hyperparam_list": [
       {
+        "param": "seed",
+        "values": [1, 79745, 89]
+      },
+      {
         "param": "name",
         "values": ["maze2d-open-v0"]
       },
@@ -70,10 +74,6 @@
       {
         "param": "max_runtime",
         "values": [90]
-      },
-      {
-        "param": "seed",
-        "values": [1, 79745, 89]
       }
     ]
   }
