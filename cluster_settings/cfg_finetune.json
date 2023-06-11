@@ -22,12 +22,21 @@
         "test_resume": false,
         "pre_training": false
   },
+    "config_bindings":[
+        {"agent.policy.epsilon_schedule.total_steps": 500000},
+        {"checkpoint": "checkpoints/love_grid_world.ckpt"},
+        {"threshold": 0},
+        {"sparse_reward": true},
+        {"visit_length": 3},
+        {"bc": false},
+        {"oracle": false},
+        {"env": "compile\\"}
+    ],
   "hyperparam_list":[
     {
       "param": "configs",
       "values":[["configs/default.json", "love_grid_world"]]
     },
-    
     {
       "param": "base_dir",
       "values":["experiments"]

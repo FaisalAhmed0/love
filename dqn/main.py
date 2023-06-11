@@ -6,7 +6,7 @@ import time
 import pickle
 
 import git
-import gym_miniworld
+# import gym_miniworld
 import numpy as np
 import torch
 import tqdm
