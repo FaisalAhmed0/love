@@ -35,7 +35,7 @@
   "hyperparam_list":[
     {
       "param": "configs",
-      "values":[["configs/default.json", "love_grid_world"]]
+      "values":[["/home/fmohamed/love/configs/default.json"]]
     },
     {
       "param": "base_dir",
