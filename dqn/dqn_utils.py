@@ -2,6 +2,7 @@ import os
 
 import torch
 from torch.utils import tensorboard
+import wandb
 
 
 def pad(episodes):
@@ -38,3 +39,13 @@ class EpisodeAndStepWriter(object):
     def add_scalar(self, key, value, episode, step):
         self._episode_writer.add_scalar(key, value, episode)
         self._step_writer.add_scalar(key, value, step)
+
+
+class EpisodeAndStepWriter_wandb(object):
+    """Logs to tensorboard against both episode and number of steps."""
+
+    def __init__(self, log_dir):
+        pass
+    def add_scalar(self, key, value, episode, step):
+        wandb.log({key: value}, step=episode)
+        wandb.log({key: value}, step=step)

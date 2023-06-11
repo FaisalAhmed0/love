@@ -19,7 +19,8 @@
     "restarts": 1,
     "samples": 1,
     "fixed_params": {
-        "test_resume": false
+        "test_resume": false,
+        "pre_training": true
       },    
     "hyperparam_list": [
       {
@@ -56,7 +57,7 @@
       },
       {
         "param": "use_min_length_boundary_mask",
-        "values": [true]
+        "values": [false]
       },
       {
         "param": "latent_n",

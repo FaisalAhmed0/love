@@ -19,6 +19,7 @@ import option_wrapper
 import rl
 import utils
 from world3d import world3d
+import wandb
 
 
 def run_episode(env, policy, experience_observers=None, test=False,
@@ -74,34 +75,47 @@ def run_episode(env, policy, experience_observers=None, test=False,
             return episode, renders
 
 
-def main():
-    arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument(
-            '-c', '--configs', action='append', default=["configs/default.json"])
-    arg_parser.add_argument(
-            '-b', '--config_bindings', action='append', default=[],
-            help="bindings to overwrite in the configs.")
-    arg_parser.add_argument(
-            "-x", "--base_dir", default="experiments",
-            help="directory to log experiments")
-    arg_parser.add_argument(
-            "-p", "--checkpoint", default=None,
-            help="path to checkpoint directory to load from or None")
-    arg_parser.add_argument(
-            "-f", "--force_overwrite", action="store_true",
-            help="Overwrites experiment under this experiment name, if it exists.")
-    arg_parser.add_argument(
-            "-s", "--seed", default=0, help="random seed to use.", type=int)
-    arg_parser.add_argument("exp_name", help="name of the experiment to run")
-    args = arg_parser.parse_args()
+def main(params=None):
+    # arg_parser = argparse.ArgumentParser()
+    # arg_parser.add_argument(
+    #         '-c', '--configs', action='append', default=["configs/default.json"])
+    # arg_parser.add_argument(
+    #         '-b', '--config_bindings', action='append', default=[],
+    #         help="bindings to overwrite in the configs.")
+    # arg_parser.add_argument(
+    #         "-x", "--base_dir", default="experiments",
+    #         help="directory to log experiments")
+    # arg_parser.add_argument(
+    #         "-p", "--checkpoint", default=None,
+    #         help="path to checkpoint directory to load from or None")
+    # arg_parser.add_argument(
+    #         "-f", "--force_overwrite", action="store_true",
+    #         help="Overwrites experiment under this experiment name, if it exists.")
+    # arg_parser.add_argument(
+    #         "-s", "--seed", default=0, help="random seed to use.", type=int)
+    # arg_parser.add_argument("exp_name", help="name of the experiment to run")
+    # args = arg_parser.parse_args()
+    args = {
+        "configs": ["configs/default.json"],
+        "config_bindings": [],
+        "base_dir": "experiments",
+        "checkpoint": None,
+        "force_overwrite": False,
+        "seed": 1,
+        "exp_name": None, # This is a required argument
+    }
+    if params:
+        for key in params:
+            args[key] = params[key]
+    assert args["exp_name"] is not None
     config = cfg.Config.from_files_and_bindings(
-            args.configs, args.config_bindings)
+            args["configs"], args["config_bindings"])
 
-    np.random.seed(args.seed)
-    torch.manual_seed(args.seed)
+    np.random.seed(args["seed"])
+    torch.manual_seed(args["seed"])
 
-    exp_dir = os.path.join(os.path.expanduser(args.base_dir), args.exp_name)
-    if os.path.exists(exp_dir) and not args.force_overwrite:
+    exp_dir = os.path.join(os.path.expanduser(args["base_dir"]), args["exp_name"])
+    if os.path.exists(exp_dir) and not args["force_overwrite"]:
         raise ValueError("Experiment already exists at: {}".format(exp_dir))
     shutil.rmtree(exp_dir, ignore_errors=True)  # remove directory if exists
     time.sleep(5)
@@ -110,6 +124,7 @@ def main():
     with open(os.path.join(exp_dir, "config.json"), "w+") as f:
         config.to_file(f)
     print(config)
+    print(f"params:{params}")
 
     with open(os.path.join(exp_dir, "metadata.txt"), "w+") as f:
         repo = git.Repo()
@@ -120,8 +135,19 @@ def main():
             f.write(str(patch))
             f.write("\n\n")
 
+    uid = wandb.util.generate_id()
+    wandb.init(
+        id = uid,
+        resume="allow",
+        project="love",
+        name=args["exp_name"],
+        sync_tensorboard=False,
+        settings=wandb.Settings(start_method="fork"),
+    )
+
     tb_writer = dqn_utils.EpisodeAndStepWriter(
             os.path.join(exp_dir, "tensorboard"))
+    wandb_writer = dqn_utils.EpisodeAndStepWriter_wandb(None)
     hssm = torch.load(config.get("checkpoint")).cpu()
     hssm._use_min_length_boundary_mask = True
     hssm.eval()
@@ -211,9 +237,15 @@ def main():
             tb_writer.add_scalar(
                     "reward/train", np.mean(train_rewards), episode_num,
                     total_steps)
+            wandb_writer.add_scalar(
+                    "reward/train", np.mean(train_rewards), episode_num,
+                    total_steps)
 
             tb_writer.add_scalar(
                     "reward/test", np.mean(test_rewards), episode_num,
+                    total_steps)
+            wandb_writer.add_scalar(
+                    "reward/test", np.mean(train_rewards), episode_num,
                     total_steps)
 
             for k, v in agent.stats.items():
