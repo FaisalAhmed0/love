@@ -9,27 +9,10 @@ from cluster import exit_for_resume, read_params_from_cmdline, save_metrics_para
 os.environ['PYTHONPATH'] = '/home/fmohamed/love'
 
 
-def main():
+def main_cluster():
     params = read_params_from_cmdline()
     print(f"params:{params}")
-    if params["pre_training"]:
-        # check if the path already exists
-        resume = False
-        name = params["name"]
-        seed = params["seed"]
-        snapshot_dir = Path(f"/home/fmohamed/love_snapshots_{name}_seed_{seed}")
-        snapshot = snapshot_dir / f'snapshot_latest.pt'
-        print(f"snapshot_dir:{snapshot}")
-        if os.path.exists(snapshot):
-            resume = True
-            workspace = Workspace(params, resume)
-            workspace.load_snapshot()
-            print("This path exists")
-        else:
-            workspace = Workspace(params, resume)
-        exitcode = workspace.main()
-    else:
-        exitcode = main(params)
+    exitcode = main(params)
     if exitcode == 3:
         return exit_for_resume()
     else:
@@ -37,6 +20,6 @@ def main():
 
 
 if __name__ == "__main__":    
-    main()
+    main_cluster()
     
 
