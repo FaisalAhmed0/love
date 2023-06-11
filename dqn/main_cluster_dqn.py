@@ -3,6 +3,7 @@ import time
 from pathlib import Path
 import numpy as np
 from train_rl import Workspace
+from dqn import main
 from cluster import exit_for_resume, read_params_from_cmdline, save_metrics_params
 
 os.environ['PYTHONPATH'] = '/home/fmohamed/love'
