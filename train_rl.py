@@ -193,7 +193,9 @@ class Workspace:
                 id = self.uid,
                 resume="allow",
                 project="love",
+                config=self.args,
                 name=self.exp_name,
+                group=self.args["name"],
                 sync_tensorboard=False,
                 settings=wandb.Settings(start_method="fork"),
             )
