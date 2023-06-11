@@ -15,7 +15,11 @@ def main_cluster():
         all_parma = json.load(f)
     print(f"all_parma:{all_parma}")
     params = read_params_from_cmdline()
-    params["config_bindings"] = all_parma["config_bindings"]
+    try:
+        params["config_bindings"] = all_parma["config_bindings"]
+    except Exception as error:
+        print(f"error:{error}")
+        quit()
     print(f"params:{params}")
     exitcode = main(params)
     if exitcode == 3:
