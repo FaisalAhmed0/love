@@ -75,7 +75,7 @@ def parse_args():
         "rec_coeff": 1.0,
         "use_abs_pos_kl": 0,
         "coding_len_coeff": 1.0,
-        "use_min_length_boundary_mask": True,
+        "use_min_length_boundary_mask": False,
 
         "action_type": "d",  # d for discrete, c for continuous
 
