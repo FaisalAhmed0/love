@@ -76,6 +76,7 @@ def run_episode(env, policy, experience_observers=None, test=False,
 
 
 def main(params=None):
+    print("main has been called")
     # arg_parser = argparse.ArgumentParser()
     # arg_parser.add_argument(
     #         '-c', '--configs', action='append', default=["configs/default.json"])
