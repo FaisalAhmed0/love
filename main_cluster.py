@@ -11,6 +11,7 @@ from cluster import exit_for_resume, read_params_from_cmdline, save_metrics_para
 
 def main():
     params = read_params_from_cmdline()
+    print(f"params:{params}")
     if params["pre_training"]:
         # check if the path already exists
         resume = False
