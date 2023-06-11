@@ -24,10 +24,6 @@
   },
   "hyperparam_list":[
     {
-      "param": "configs",
-      "values":[["configs/default.json", "love_grid_world"]]
-    },
-    {
       "param": "config_bindings",
       "values":[
           {"agent.policy.epsilon_schedule.total_steps": 500000},
