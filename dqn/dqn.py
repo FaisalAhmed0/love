@@ -242,7 +242,8 @@ class DQNPolicy(nn.Module):
             gamma (float): discount factor
         """
         super().__init__()
-        # TODO: modify this to accept continous actions, you need to change the q architecture so that it take state and action
+        # TODO: modify this to accept continous actions, you need to change the q architecture so that it take state and action\
+        print("action type", action_type)
         self._num_actions = num_actions
         self._epsilon_schedule = epsilon_schedule
         self._test_epsilon = test_epsilon
