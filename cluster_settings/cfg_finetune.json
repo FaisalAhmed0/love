@@ -5,7 +5,7 @@
       "branch": "main",
       "commit": null
     },
-    "script_relative_path": "dqn/main.py",
+    "script_relative_path": "dqn/main_cluster.py",
     "remove_jobs_dir": false,
     "environment_setup": {},
     "cluster_requirements": {

@@ -107,6 +107,8 @@ def main(params=None):
     if params:
         for key in params:
             args[key] = params[key]
+    name = args["exp_name"]
+    print(f"name: {name}")
     assert args["exp_name"] is not None
     config = cfg.Config.from_files_and_bindings(
             args["configs"], args["config_bindings"])
