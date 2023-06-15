@@ -38,7 +38,7 @@
       },
       {
         "param": "name",
-        "values": ["maze2d-open-v0"]
+        "values": ["maze2d-open-v2"]
       },
       {
         "param": "coding_len_coeff",

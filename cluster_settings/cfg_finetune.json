@@ -24,7 +24,7 @@
   },
     "config_bindings":[
       "agent.policy.epsilon_schedule.total_steps=500000",
-      "checkpoint=\"/home/fmohamed/experiments/grid_world_love_seed_1/model-16000.ckpt\"",
+      "checkpoint=\"/home/fmohamed/experiments/maze2d-open-v0_seed_1/model-20000.ckpt\"",
       "threshold=0",
       "sparse_reward=True",
       "visit_length=3",
@@ -39,11 +39,11 @@
     },
     {
       "param": "base_dir",
-      "values":["experiments"]
+      "values":["experiments_finetune"]
     },
     {
       "param": "checkpoint",
-      "values":["/home/fmohamed/checkpoints"]
+      "values":["/home/fmohamed/experiments/maze2d-open-v0_seed_1/model-20000.ckpt"]
     },
     {
       "param": "force_overwrite",
@@ -55,7 +55,7 @@
     },
     {
       "param": "exp_name", 
-      "values":["testing"]
+      "values":["testing2"]
     }
   ]
 }
