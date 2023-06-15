@@ -2,7 +2,7 @@ import os
 import time
 from pathlib import Path
 import numpy as np
-from train_rl import Workspace
+# from train_rl import Workspace
 from main import main
 from cluster import exit_for_resume, read_params_from_cmdline, save_metrics_params
 import json
