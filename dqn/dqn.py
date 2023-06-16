@@ -589,7 +589,7 @@ def epsilon_greedy(q_values, epsilon, action_types="d", action_dim=None):
             if np.random.random() > epsilon:
                 actions.append(q_values[i].squeeze())
             else:
-                actions.append(np.random.randint(0, action_dim))
+                actions.append(np.random.uniform(size=(action_dim, )))
 
     return actions
 
