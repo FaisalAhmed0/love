@@ -206,7 +206,7 @@ class DQNPolicy(nn.Module):
                 
             else:
                 print(f"type(env):{type(env)}")
-                print(f"type(env.env):{type(env.env)}")
+                print(f"type(env.unwrapped):{type(env.unwrapped)}")
                 raise ValueError()
 
             if embedder_config.get("type") == "recurrent":
