@@ -651,7 +651,10 @@ class HierarchicalStateSpaceModel(nn.Module):
         boundary_state = [self.combine_action_obs(torch.cat((enc_action, enc_obs), -1))]
 
         # First action is set to 0
-        enc_action = self.action_encoder(torch.zeros(1).long()).squeeze(0)
+        if self.action_type == "d":
+            enc_action = self.action_encoder(torch.zeros(1).long()).squeeze(0)
+        else:
+            enc_action = self.action_encoder(torch.zeros(action_dim, dtype=torch.float32)).squeeze(0)
         enc_obs = self.enc_obs(state.unsqueeze(0).unsqueeze(0)).squeeze(0).squeeze(0)
         boundary_state.append(
             self.combine_action_obs(torch.cat((enc_action, enc_obs), -1))
