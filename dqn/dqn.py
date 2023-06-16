@@ -297,6 +297,7 @@ class DQNPolicy(nn.Module):
             return epsilon_greedy(q_values, epsilon)[0], None
         else:
             # This may cause an error
+            print(f"state shape:{state.shape}")
             actions = self.continuous_actor(state)
             return epsilon_greedy(actions, epsilon)[0], None
 
