@@ -205,6 +205,8 @@ class DQNPolicy(nn.Module):
                 return state_embedder, action_embedder
                 
             else:
+                print(f"type(env):{type(env)}")
+                print(f"type(env.env):{type(env.env)}")
                 raise ValueError()
 
             if embedder_config.get("type") == "recurrent":
