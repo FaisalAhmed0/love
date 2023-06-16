@@ -538,6 +538,8 @@ class NNDQN(DQN):
         )
 
     def forward(self, states, actions):
+        print("NNDQN")
+        print(f"states:{states}")
         state_embed, _ = self._state_embedder(states)
         action_embed, _ = self._action_embedder(actions)
         return self.model(torch.cat([state_embed, action_embed], dim=1)), None
