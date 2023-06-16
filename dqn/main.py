@@ -181,7 +181,7 @@ def main(params=None, config_bindings=None):
     #     hssm._output_normal = False
     else:
         env = gym.make(config.get("env"))
-        train_loader = utils.d4rl_loader(100)[0]
+        train_loader = utils.d4rl_loader(100, config.get("env"))[0]
         hssm.post_obs_state._output_normal = True
         hssm._output_normal = True
 
