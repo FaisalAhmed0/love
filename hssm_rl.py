@@ -636,10 +636,13 @@ class HierarchicalStateSpaceModel(nn.Module):
         num_reads = boundaries.sum(dim=1).mean()
         return entropy * num_reads
 
-    def initial_boundary_state(self, state):
+    def initial_boundary_state(self, state, action_dim=0):
         # Initial padding token
         # Padding action *embedding* is masked out
-        enc_action = self.action_encoder(torch.zeros(1).long())
+        if self.action_type == "d":
+            enc_action = self.action_encoder(torch.zeros(1).long())
+        else:
+            enc_action = self.action_encoder(torch.zeros(action_dim, dtype=torch.float32))
         enc_action = enc_action.squeeze(0) * 0
         padding_state = state * 0
         enc_obs = (
