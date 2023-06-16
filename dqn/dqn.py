@@ -286,12 +286,12 @@ class DQNPolicy(nn.Module):
             hidden_state (None)
         """
         del prev_hidden_state
-        if self._action_type == "d":
-            q_values, hidden_state = self._Q([state], None)
-            if test:
+        if test:
                 epsilon = self._test_epsilon
             else:
                 epsilon = self._epsilon_schedule.step()
+        if self._action_type == "d":
+            q_values, hidden_state = self._Q([state], None)
             self._max_q.append(torch.max(q_values).item())
             self._min_q.append(torch.min(q_values).item())
             return epsilon_greedy(q_values, epsilon)[0], None
