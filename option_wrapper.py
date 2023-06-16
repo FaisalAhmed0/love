@@ -191,7 +191,7 @@ class OptionWrapperContinous(gym.Wrapper):
 
         # Taking an option as an action
         # Follows the option until the option terminates
-        option = options_probs.argmax()
+        option = options_probs[:-1].argmax()
         z = self._permitted_zs[option]
         state = self._current_state
         total_reward = 0  # accumulate all rewards during option
