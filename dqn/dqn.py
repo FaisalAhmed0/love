@@ -299,7 +299,7 @@ class DQNPolicy(nn.Module):
             # This may cause an error
             print(f"state shape:{state.shape}")
             actions = self.continuous_actor(state)
-            return epsilon_greedy(actions, epsilon, action_types=self._action_type)[0], None
+            return epsilon_greedy(actions, epsilon, action_types=self._action_type,action_dim=self._num_actions)[0], None
 
 
     def loss(self, experiences, weights):
@@ -562,7 +562,7 @@ class DuelingNetwork(DQN):
         return V + advantage - mean_advantage, hidden_states
 
 
-def epsilon_greedy(q_values, epsilon, action_types="d"):
+def epsilon_greedy(q_values, epsilon, action_types="d", action_dim=None):
     """Returns the index of the highest q value with prob 1 - epsilon,
     otherwise uniformly at random with prob epsilon.
 
