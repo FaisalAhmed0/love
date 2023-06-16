@@ -42,7 +42,7 @@
       },
       {
         "param": "coding_len_coeff",
-        "values": [0.00]
+        "values": [0.000001]
       },
       {
         "param": "kl_coeff",
