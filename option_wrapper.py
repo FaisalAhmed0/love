@@ -178,7 +178,7 @@ class OptionWrapperContinous(gym.Wrapper):
         self._recurrent = recurrent
 
     def step(self, action):
-        if "tensor" in type(action):
+        if "tensor" in str(type(action)):
             action = action.cpu().detach().numpy()
         # Default low-level actions
         # compute the porbability of the complement
