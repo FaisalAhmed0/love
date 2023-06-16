@@ -196,17 +196,17 @@ class OptionWrapperContinous(gym.Wrapper):
         state = self._current_state
         total_reward = 0  # accumulate all rewards during option
         low_level_actions = []
-        self._boundary_state = self._hssm.initial_boundary_state(state[0].float())
+        self._boundary_state = self._hssm.initial_boundary_state(state)
         hidden_state = None
         while True:
             action, next_hidden_state = self._hssm.play_z(
-                    z, state[0].float(), hidden_state,
+                    z, state, hidden_state,
                     recurrent=self._recurrent)
             next_state, reward, done, info = self.env.step(action)
             low_level_actions.append(action)
             total_reward += reward
             terminate, self._boundary_state = self._hssm.z_terminates(
-                    next_state[0].float(), action, self._boundary_state)
+                    next_state, action, self._boundary_state)
             state = next_state
             hidden_state = next_hidden_state
             if done or terminate:
