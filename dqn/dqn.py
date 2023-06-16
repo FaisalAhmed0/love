@@ -288,8 +288,8 @@ class DQNPolicy(nn.Module):
         del prev_hidden_state
         if test:
                 epsilon = self._test_epsilon
-            else:
-                epsilon = self._epsilon_schedule.step()
+        else:
+            epsilon = self._epsilon_schedule.step()
         if self._action_type == "d":
             q_values, hidden_state = self._Q([state], None)
             self._max_q.append(torch.max(q_values).item())
