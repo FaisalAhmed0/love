@@ -597,12 +597,16 @@ class Actor_NN(nn.Module):
     "Actor model for continous action spaces"
     def __init__(self, inpt_dim, output_dim, state_embedder):
         super().__init__()
-        hidden_dim = inpt_dim
+        hidden_dim = 128
         self.model = nn.Sequential(
             nn.Linear(inpt_dim, hidden_dim ), nn.ReLU(),
         )
         self.head = nn.Linear(hidden_dim, output_dim)
         self._state_embedder = state_embedder
+        print(f"Actor")
+        print(f"_state_embedder:{self._state_embedder}")
+        print(f"model:{self.model}")
+        print(f"head:{self.head}")
         
 
     def forward(self, x):
