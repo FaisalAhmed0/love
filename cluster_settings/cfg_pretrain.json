@@ -34,7 +34,7 @@
     "hyperparam_list": [
       {
         "param": "seed",
-        "values": [1, 79745, 89]
+        "values": [1]
       },
       {
         "param": "name",
