@@ -299,7 +299,7 @@ class DQNPolicy(nn.Module):
             # This may cause an error
             print(f"state shape:{state.shape}")
             actions = self.continuous_actor(state)
-            return epsilon_greedy(actions, epsilon)[0], None
+            return epsilon_greedy(actions, epsilon, action_types=self._action_type)[0], None
 
 
     def loss(self, experiences, weights):
