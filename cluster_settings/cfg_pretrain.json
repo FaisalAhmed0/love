@@ -1,6 +1,6 @@
 {
-    "optimization_procedure_name": "love_baseline_d4rlmaze",
-    "results_dir": "/fast/fmohamed/love_baseline_d4rlmaze",
+    "optimization_procedure_name": "love_baseline_d4rlmaze2",
+    "results_dir": "/fast/fmohamed/love_baseline_d4rlmaze2",
     "git_params": {
       "branch": "main",
       "commit": null

@@ -295,12 +295,19 @@ class HierarchicalStateSpaceModel(nn.Module):
         for fwd_t, bwd_t in zip(range(full_seq_size), reversed(range(full_seq_size))):
             # forward encoding
             fwd_copy_data = boundary_data_list[:, fwd_t, 1].unsqueeze(-1)  # (B, 1)
-            abs_post_fwd = self.abs_post_fwd(
-                enc_combine_obs_action_list[:, fwd_t], abs_post_fwd
-            )  # abs_post_fwd is psi for z
-            obs_post_fwd = self.obs_post_fwd(
-                enc_obs_list[:, fwd_t], fwd_copy_data * obs_post_fwd
-            )  # obs_post_fwd is phi for s
+            if self.action_type == "d":
+                abs_post_fwd = self.abs_post_fwd(
+                    enc_combine_obs_action_list[:, fwd_t], abs_post_fwd
+                )  # abs_post_fwd is psi for z
+                obs_post_fwd = self.obs_post_fwd(
+                    enc_obs_list[:, fwd_t], fwd_copy_data * obs_post_fwd
+                )  # obs_post_fwd is phi for s
+            else:
+                abs_post_fwd = abs_post_fwd
+                obs_post_fwd = obs_post_fwd # obs_post_fwd is phi for s
+                print(f"abs_post_fwd.shape:{abs_post_fwd.shape}")
+                print(f"obs_post_fwd.shape:{obs_post_fwd.shape}")
+
             abs_post_fwd_list.append(abs_post_fwd)
             obs_post_fwd_list.append(obs_post_fwd)
             # backward encoding
@@ -351,10 +358,17 @@ class HierarchicalStateSpaceModel(nn.Module):
             #############################
 
             abs_belief = abs_post_fwd_list[t - 1] * 0
+            if self.action_type == "d":
+                vq_loss, z, perplexity, onehot_z, z_logit = self.post_abs_state(
+                    concat(abs_post_fwd_list[t - 1], abs_post_bwd_list[t])
+                )
+            else:
+                vq_loss, z, perplexity, onehot_z, z_logit = self.post_abs_state(
+                    concat(abs_post_fwd_list[t - 1], abs_post_bwd_list[t])
+                )
+                print(f"onehot_z.shape:{onehot_z.shape}")
+                print(f"z_logit.shape:{z_logit.shape}")
 
-            vq_loss, z, perplexity, onehot_z, z_logit = self.post_abs_state(
-                concat(abs_post_fwd_list[t - 1], abs_post_bwd_list[t])
-            )
             abs_state = read_data * z + copy_data * abs_state
 
             abs_feat = self.abs_feat(
