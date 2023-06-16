@@ -170,7 +170,7 @@ class OptionWrapperContinous(gym.Wrapper):
                               if marginal[z] >= threshold]
 
         # Action space is default low-level actions + options
-        self.action_space = spaces.Box(
+        self.action_space = spaces.Discrete(
                  len(self._permitted_zs)+1, env.action_space.shape[0])
 
         self._current_state = None
