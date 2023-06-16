@@ -248,7 +248,7 @@ def main(params=None, config_bindings=None):
             episode, render = run_episode(
                     env, agent, test=True, return_render=False)
             test_rewards.append(sum(exp.reward for exp in episode))
-            if return_render:
+            if False:
                 frames = [frame.image() for frame in render]
                 episodic_returns = sum(exp.reward for exp in episode)
                 save_path = os.path.join(visualize_dir, f"{episode_num}.gif")
