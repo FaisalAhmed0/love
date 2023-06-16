@@ -202,7 +202,7 @@ class OptionWrapperContinous(gym.Wrapper):
             action, next_hidden_state = self._hssm.play_z(
                     z, state, hidden_state,
                     recurrent=self._recurrent)
-            next_state, reward, done, info = self.env.step(action)
+            next_state, reward, done, info = self.env.step(action.cpu())
             low_level_actions.append(action)
             total_reward += reward
             terminate, self._boundary_state = self._hssm.z_terminates(
