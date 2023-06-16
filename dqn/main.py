@@ -57,7 +57,7 @@ def run_episode(env, policy, experience_observers=None, test=False,
     # renders = [maybe_render(env, state[1], None, 0, {}, timestep)]
     hidden_state = None
     while True:
-        print(f"state in main:{state}")
+        # print(f"state in main:{state}")
         action, next_hidden_state = policy.act(state, hidden_state, test=test)
         next_state, reward, done, info = env.step(action)
         timestep += 1

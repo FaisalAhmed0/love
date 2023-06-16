@@ -372,8 +372,8 @@ class HierarchicalStateSpaceModel(nn.Module):
                 vq_loss, z, perplexity, onehot_z, z_logit = self.post_abs_state(
                     concat(abs_post_fwd_list[t - 1], abs_post_bwd_list[t])
                 )
-                print(f"onehot_z.shape:{onehot_z.shape}")
-                print(f"z_logit.shape:{z_logit.shape}")
+                # print(f"onehot_z.shape:{onehot_z.shape}")
+                # print(f"z_logit.shape:{z_logit.shape}")
 
             abs_state = read_data * z + copy_data * abs_state
 
@@ -516,8 +516,8 @@ class HierarchicalStateSpaceModel(nn.Module):
         #######################
         # observation encoder #
         #######################
-        print(f"enc_obs:{self.enc_obs}")
-        print(f"obs_data_list.shape{obs_data_list.shape}")
+        # print(f"enc_obs:{self.enc_obs}")
+        # print(f"obs_data_list.shape{obs_data_list.shape}")
         enc_obs_list = self.enc_obs(obs_data_list)
         enc_action_list = self.action_encoder(action_list)
 
