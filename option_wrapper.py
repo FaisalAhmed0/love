@@ -181,11 +181,11 @@ class OptionWrapperContinous(gym.Wrapper):
 
         # Default low-level actions
         # compute the porbability of the complement
-        options_probs = self.softmax(action[:self.env.action_space.shape[0]])
+        options_probs = self.softmax(action[:len(self._permitted_zs)+1])
         option_selection_prob = options_probs[:-1].sum()
         low_level_control_prob = 1 - option_selection_prob
         if low_level_control_prob > option_selection_prob:
-            state, reward, done, info = self.env.step(action)
+            state, reward, done, info = self.env.step(action[len(self._permitted_zs)+1:])
             self._current_state = state
             return state, reward, done, info
 
