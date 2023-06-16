@@ -541,7 +541,7 @@ class NNDQN(DQN):
         print("NNDQN")
         print(f"states:{states}")
         state_embed, _ = self._state_embedder(torch.cat(states))
-        action_embed, _ = self._action_embedder(actions)
+        action_embed, _ = self._action_embedder(torch.cat(actions))
         return self.model(torch.cat([state_embed, action_embed], dim=1)), None
 
 
