@@ -598,12 +598,13 @@ class Actor_NN(nn.Module):
         hidden_dim = inpt_dim
         self.model = nn.Sequential(
             nn.Linear(inpt_dim, hidden_dim ), nn.ReLU(),
-            nn.Linear(hidden_dim, output_dim)
         )
+        self.head = nn.Linear(hidden_dim, output_dim)
         self._state_embedder = state_embedder
         
 
     def forward(self, x):
         x = torch.tensor
         x = self._state_embedder(x).detach()
-        return self.model(x)
+        x =  self.head(self.model(x))
+        return x

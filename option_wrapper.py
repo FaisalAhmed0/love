@@ -165,25 +165,28 @@ class OptionWrapperContinous(gym.Wrapper):
 
         # Action space is default low-level actions + options
         self.action_space = spaces.Discrete(
-                env.action_space.shape[0] + len(self._permitted_zs))
+                 len(self._permitted_zs)+1, env.action_space.shape[0])
 
         self._current_state = None
         self._boundary_state = None
         self._recurrent = recurrent
 
     def step(self, action):
+
         # Default low-level actions
         # compute the porbability of the complement
-        option_probs =  action[self.env.action_space.shape[0]:]
-        control_prbs = 
-        if action < self.env.action_space.n:
+        options_probs = self.softmax(action[:self.env.action_space.shape[0]])
+        option_selection_prob = options_probs[:-1].sum()
+        low_level_control_prob = 1 - option_selection_prob
+        if low_level_control_prob > option_selection_prob:
             state, reward, done, info = self.env.step(action)
             self._current_state = state
             return state, reward, done, info
 
         # Taking an option as an action
         # Follows the option until the option terminates
-        z = self._permitted_zs[action - self.env.action_space.n]
+        option = options_probs.argmax()
+        z = self._permitted_zs[option]
         state = self._current_state
         total_reward = 0  # accumulate all rewards during option
         low_level_actions = []
