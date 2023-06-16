@@ -91,7 +91,7 @@ class TensorWrapper(gym.ObservationWrapper):
     
 class TensorWrapperD4RL(gym.ObservationWrapper):
     def observation(self, state):
-        return torch.tensor(state)
+        return torch.tensor(state, dtype=torch.float32)
     
 
 
