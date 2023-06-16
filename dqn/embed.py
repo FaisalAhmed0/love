@@ -32,7 +32,7 @@ class IdentityEmbedder(Embedder):
         super().__init__(embed_dim)
 
     def forward(self, inpt, hidden_state=None):
-        inpt = torch.tensor(inpt, device=inpt[0].device)
+        inpt = torch.as_tensor(inpt)
         return nn.Identity()(inpt), hidden_state
     
     @property
