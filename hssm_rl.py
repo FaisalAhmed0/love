@@ -292,8 +292,8 @@ class HierarchicalStateSpaceModel(nn.Module):
         abs_post_fwd = action_list.new_zeros(num_samples, self.abs_belief_size).float()
         abs_post_bwd = action_list.new_zeros(num_samples, self.abs_belief_size).float()
         obs_post_fwd = action_list.new_zeros(num_samples, self.obs_belief_size).float()
-        print(f"Inside the hssm forward pass")
-        print(f"action type is:{self.action_type}")
+        # print(f"Inside the hssm forward pass")
+        # print(f"action type is:{self.action_type}")
         for fwd_t, bwd_t in zip(range(full_seq_size), reversed(range(full_seq_size))):
             # forward encoding
             fwd_copy_data = boundary_data_list[:, fwd_t, 1].unsqueeze(-1)  # (B, 1)
@@ -307,8 +307,8 @@ class HierarchicalStateSpaceModel(nn.Module):
             else:
                 abs_post_fwd = abs_post_fwd
                 obs_post_fwd = obs_post_fwd # obs_post_fwd is phi for s
-                print(f"abs_post_fwd.shape:{abs_post_fwd.shape}")
-                print(f"obs_post_fwd.shape:{obs_post_fwd.shape}")
+                # print(f"abs_post_fwd.shape:{abs_post_fwd.shape}")
+                # print(f"obs_post_fwd.shape:{obs_post_fwd.shape}")
 
             abs_post_fwd_list.append(abs_post_fwd)
             obs_post_fwd_list.append(obs_post_fwd)
@@ -485,7 +485,7 @@ class HierarchicalStateSpaceModel(nn.Module):
         # process vq loss
         vq_loss_list = torch.stack(vq_loss_list)
 
-        quit()
+        # quit()
         # return
         return [
             obs_rec_list,
