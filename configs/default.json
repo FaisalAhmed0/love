@@ -8,7 +8,8 @@
         "total_steps": 500000
       },
       "embedder": {
-        "embed_dim": 4
+        "embed_dim": 4,
+        "embed_dim_action":11
       },
       "test_epsilon": 0,
       "discount": 0.99,

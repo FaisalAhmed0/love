@@ -201,7 +201,7 @@ class DQNPolicy(nn.Module):
             #             embedder_config.get("embed_dim"))
             elif "d4rl" in str(type(env.unwrapped)):
                 state_embedder = embed.IdentityEmbedder(embedder_config.get("embed_dim"))
-                action_embedder = embed.IdentityEmbedder(embedder_config.get("embed_dim"))
+                action_embedder = embed.IdentityEmbedder(embedder_config.get("embed_dim_action"))
                 return state_embedder, action_embedder
                 
             else:
