@@ -1,6 +1,7 @@
 import tqdm
 import gym
 from gym import spaces
+import d4rl
 import torch
 
 import numpy as np
