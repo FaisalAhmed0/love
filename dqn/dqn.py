@@ -547,8 +547,7 @@ class NNDQN(DQN):
         action_embed, _ = self._action_embedder((actions))
         print(f"state_embed shape:{state_embed.shape}")
         print(f"action_embed shape:{action_embed.shape}")
-        return self.model(torch.cat([state_embed, action_embed], dim=1)), None
-
+        return self.model(torch.cat([state_embed, action_embed], dim=1))
 
 
 class DuelingNetwork(DQN):
