@@ -305,8 +305,12 @@ class HierarchicalStateSpaceModel(nn.Module):
                     enc_obs_list[:, fwd_t], fwd_copy_data * obs_post_fwd
                 )  # obs_post_fwd is phi for s
             else:
-                abs_post_fwd = abs_post_fwd
-                obs_post_fwd = obs_post_fwd # obs_post_fwd is phi for s
+                abs_post_fwd = self.abs_post_fwd(
+                    enc_combine_obs_action_list[:, fwd_t], abs_post_fwd
+                )  # abs_post_fwd is psi for z
+                obs_post_fwd = self.obs_post_fwd(
+                    enc_obs_list[:, fwd_t], fwd_copy_data * obs_post_fwd
+                )  # obs_post_fwd is phi for s
                 # print(f"abs_post_fwd.shape:{abs_post_fwd.shape}")
                 # print(f"obs_post_fwd.shape:{obs_post_fwd.shape}")
 
