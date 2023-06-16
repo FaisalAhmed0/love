@@ -189,10 +189,16 @@ def main(params=None, config_bindings=None):
         assert config.get("env") == "compile"
         env = option_wrapper.OracleOptionWrapper(env)
     else:
-        env = option_wrapper.OptionWrapper(
+        if "maze" in config.get("env"):
+            env = option_wrapper.OptionWrapperContinous(
                 env, hssm, train_loader, train_loader.dataset.seq_size, 1,
                 threshold=config.get("threshold"),
                 recurrent=config.get("recurrent"))
+        else:
+            env = option_wrapper.OptionWrapper(
+                    env, hssm, train_loader, train_loader.dataset.seq_size, 1,
+                    threshold=config.get("threshold"),
+                    recurrent=config.get("recurrent"))
         hssm = hssm.cuda()
 
     # Use GPU if possible
