@@ -358,7 +358,7 @@ class DQNPolicy(nn.Module):
     def actor_loss(self, experiences):
         states = [e.state for e in experiences]
         # compute actions given states
-        actions = self.continuous_actor(states)
+        actions = self.continuous_actor(torch.stack(states))
         # compute the Q values given the states and actions computed by the actor
         q_values = self._Q(states, actions)
         # compute and return the actor loss
