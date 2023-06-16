@@ -6,6 +6,8 @@ import time
 import pickle
 
 import git
+import gym
+import d4rl
 # import gym_miniworld
 import numpy as np
 import torch
@@ -178,7 +180,10 @@ def main(params=None, config_bindings=None):
     #     hssm.post_obs_state._output_normal = False
     #     hssm._output_normal = False
     else:
-        raise ValueError()
+        env = gym.make(config.get("env"))
+        train_loader = utils.d4rl_loader(100)[0]
+        hssm.post_obs_state._output_normal = True
+        hssm._output_normal = True
 
     if config.get("oracle", False):
         assert config.get("env") == "compile"
