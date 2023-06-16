@@ -495,6 +495,8 @@ class HierarchicalStateSpaceModel(nn.Module):
         #######################
         # observation encoder #
         #######################
+        print(f"enc_obs:{self.enc_obs}")
+        print(f"obs_data_list.shape"{obs_data_list.shape}")
         enc_obs_list = self.enc_obs(obs_data_list)
         enc_action_list = self.action_encoder(action_list)
 
