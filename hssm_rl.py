@@ -485,6 +485,7 @@ class HierarchicalStateSpaceModel(nn.Module):
         # process vq loss
         vq_loss_list = torch.stack(vq_loss_list)
 
+        quit()
         # return
         return [
             obs_rec_list,
