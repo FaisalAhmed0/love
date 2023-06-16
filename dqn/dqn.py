@@ -298,6 +298,7 @@ class DQNPolicy(nn.Module):
         else:
             # This may cause an error
             print(f"state shape:{state.shape}")
+            if len(state.shape) == 1: state=state[None, :]
             actions = self.continuous_actor(state)
             return epsilon_greedy(actions, epsilon, action_types=self._action_type,action_dim=self._num_actions)[0], None
 
