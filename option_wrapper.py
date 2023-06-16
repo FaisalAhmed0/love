@@ -178,11 +178,11 @@ class OptionWrapperContinous(gym.Wrapper):
         self._recurrent = recurrent
 
     def step(self, action):
-        if "tensor" in str(type(action)):
-            action = action.cpu().detach().numpy()
+        # if "tensor" in str(type(action)):
+        #     action = action.cpu().detach().numpy()
         # Default low-level actions
         # compute the porbability of the complement
-        # print(action)
+        print(action)
         options_probs = self.softmax(action[:len(self._permitted_zs)+1])
         option_selection_prob = options_probs[:-1].sum()
         low_level_control_prob = 1 - option_selection_prob

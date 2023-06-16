@@ -588,7 +588,7 @@ def epsilon_greedy(q_values, epsilon, action_types="d", action_dim=None):
         batch_size = q_values.shape[0]
         for i in range(batch_size):
             if np.random.random() > epsilon:
-                actions.append(q_values[i].squeeze())
+                actions.append(q_values[i].squeeze().cpu().detach().numpy())
             else:
                 actions.append(np.random.uniform(size=(action_dim, )))
 
