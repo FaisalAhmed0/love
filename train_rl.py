@@ -328,7 +328,7 @@ class Workspace:
                 )
 
                 if self.args["coding_len_coeff"] > 0:
-                    if results["obs_cost"].mean() < 0.02:
+                    if results["obs_cost"].mean() < 0.03:
                         self.model.coding_len_coeff += 0.00002
                     elif b_idx > 0:
                         self.model.coding_len_coeff -= 0.00002
