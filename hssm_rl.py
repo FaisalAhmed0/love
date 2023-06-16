@@ -292,6 +292,8 @@ class HierarchicalStateSpaceModel(nn.Module):
         abs_post_fwd = action_list.new_zeros(num_samples, self.abs_belief_size).float()
         abs_post_bwd = action_list.new_zeros(num_samples, self.abs_belief_size).float()
         obs_post_fwd = action_list.new_zeros(num_samples, self.obs_belief_size).float()
+        print(f"Inside the hssm forward pass")
+        print(f"action type is:{self.action_type}")
         for fwd_t, bwd_t in zip(range(full_seq_size), reversed(range(full_seq_size))):
             # forward encoding
             fwd_copy_data = boundary_data_list[:, fwd_t, 1].unsqueeze(-1)  # (B, 1)
