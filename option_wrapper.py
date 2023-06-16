@@ -88,6 +88,12 @@ class OptionWrapper(gym.Wrapper):
 class TensorWrapper(gym.ObservationWrapper):
     def observation(self, state):
         return torch.tensor(state[0]), torch.tensor(state[1])
+    
+class TensorWrapperD4RL(gym.ObservationWrapper):
+    def observation(self, state):
+        return torch.tensor(state)
+    
+
 
 
 class OracleOptionWrapper(gym.Wrapper):
@@ -139,7 +145,7 @@ class OptionWrapperContinous(gym.Wrapper):
 
     def __init__(self, env, hssm, train_loader, seq_size, init_size,
                  threshold=0.05, recurrent=False):
-        super().__init__(TensorWrapper(env))
+        super().__init__(TensorWrapperD4RL(env))
 
         self._hssm = hssm
 
