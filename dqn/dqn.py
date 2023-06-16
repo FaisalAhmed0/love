@@ -340,6 +340,8 @@ class DQNPolicy(nn.Module):
                     1, best_actions).squeeze(1)
         else:
             current_state_q_values = self._Q(states, actions)
+            print(f"next_states")
+            print(next_states)
             best_actions = self.continuous_actor(next_states)
             next_state_q_values = self._target_Q(next_states, best_actions).squeeze(1)
             self.target_q.append(next_state_q_values.mean().cpu().item())
