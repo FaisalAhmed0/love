@@ -611,6 +611,6 @@ class Actor_NN(nn.Module):
 
     def forward(self, x):
         x = torch.tensor(x)
-        x = self._state_embedder(x).detach()
+        x = self._state_embedder(x)[0].detach()
         x =  self.head(self.model(x))
         return x
