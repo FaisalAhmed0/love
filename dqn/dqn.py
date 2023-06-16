@@ -199,7 +199,7 @@ class DQNPolicy(nn.Module):
             # elif isinstance(env.unwrapped, world3d.MultiTask3DEnv):
             #     state_embedder = embed.World3DEmbedder(
             #             embedder_config.get("embed_dim"))
-            elif isinstance(env.env, gym.wrappers.time_limit.TimeLimit):
+            elif "d4rl" in str(type(env)):
                 state_embedder = embed.IdentityEmbedder(embedder_config.get("embed_dim"))
                 action_embedder = embed.IdentityEmbedder(embedder_config.get("embed_dim"))
                 return state_embedder, action_embedder
