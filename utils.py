@@ -779,7 +779,7 @@ def d4rl_loader(batch_size, env_name):
     return train_loader, test_loader
 
 @torch.no_grad()
-def record_options(env_name, hssm, num_options, base_dir):
+def record_options(env_name, hssm, num_options, base_dir, device):
     init_state = (np.array([2.90749422 , 4.92641686 ]), np.array([ 0.00, 0.00]))
     all_options_images = []
     eval_env = gym.make(env_name)
@@ -795,7 +795,7 @@ def record_options(env_name, hssm, num_options, base_dir):
                 current_state = np.concatenate(init_state, axis=0)
                 print(f"state:{current_state}")
             # print(f"state.shapae:{state.shape}")
-            action, _ = hssm.state_model.play_z(option, torch.tensor(current_state)[None, :], )
+            action, _ = hssm.state_model.play_z(option, torch.tensor(current_state, device=device, dtype=torch.float32)[None, :], )
             print(f"action:{action}")
             print(f"action.shape:{action.shape}")
             action = action.cpu().detach().numpy()
