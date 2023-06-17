@@ -780,7 +780,7 @@ def d4rl_loader(batch_size, env_name):
     return train_loader, test_loader
 
 @torch.no_grad()
-def record_options(env_name, hssm, num_options, base_dir, device):
+def record_options(env_name, hssm, num_options, base_dir, device, step):
     init_state = (np.array([2.90749422 , 4.92641686 ]), np.array([ 0.00, 0.00]))
     all_options_images = []
     eval_env = gym.make(env_name)
@@ -795,11 +795,11 @@ def record_options(env_name, hssm, num_options, base_dir, device):
         for i in range(1000):
             if i == 0:
                 current_state = np.concatenate(init_state, axis=0)
-                print(f"state:{current_state}")
+                # print(f"state:{current_state}")
             # print(f"state.shapae:{state.shape}")
             action, _ = hssm.state_model.play_z(option, torch.tensor(current_state, device=device, dtype=torch.float32), )
-            print(f"action:{action}")
-            print(f"action.shape:{action.shape}")
+            # print(f"action:{action}")
+            # print(f"action.shape:{action.shape}")
             action = action.cpu().detach().numpy()
             new_state, reward, _,_ = eval_env.step(action)
             current_state = new_state
@@ -810,6 +810,6 @@ def record_options(env_name, hssm, num_options, base_dir, device):
                 r = cv2.bitwise_or(frames[i], frames[i+1])
             else:
                 r = cv2.bitwise_or(r, frames[i+1])
-        wandb.log({f"Visualization/Option{option} Path": wandb.Image(r)})
+        wandb.log({f"Visualization/Option{option} Path": wandb.Image(r)}, step=step)
             
 
