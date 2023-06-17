@@ -376,15 +376,7 @@ class Workspace:
                 np.set_printoptions(threshold=100000)
                 torch.set_printoptions(threshold=100000)
 
-                if b_idx % 10 == 0:
-                    # viualize optons for maze environment
-                    if "maze" in self.args["name"]:
-                        name = self.args["name"]
-                        seed = self.args["seed"]
-                        base_path = "/home/fmohamed/"
-                        exp_dir = Path(os.path.join(f"{base_path}/experiments", f"{name}_seed_{seed}"))
-                        exp_dir.mkdir(exist_ok=True, parents=True)
-                        utils.record_options(self.args["name"], self.model, self.args["latent_n"], exp_dir, device=self.device, step=b_idx)
+                if b_idx % 200 == 0:
                     exp_dir = os.path.join(
                         "/home/fmohamed/love_experiments", self.args["name"], str(b_idx))
                     os.makedirs(exp_dir, exist_ok=True)
@@ -546,6 +538,9 @@ class Workspace:
                         self.model.state_model, os.path.join(
                             str(exp_dir), f"model-{b_idx}.ckpt")
                     )
+                    # viualize optons for maze environment
+                    if "maze" in self.args["name"]:
+                        utils.record_options(self.args["name"], self.model, self.args["latent_n"], exp_dir, device=self.device, step=b_idx)
 
                 #############
                 # test time #
