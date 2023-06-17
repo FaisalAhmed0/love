@@ -226,10 +226,10 @@ class DQNPolicy(nn.Module):
                 config.get("epsilon_schedule"))
         return cls(env.action_space.n, epsilon_schedule,
                    config.get("test_epsilon"), embedder_factory,
-                   config.get("discount"), config.get("action_type"))
+                   config.get("discount"), config.get("action_type"), hidden_dim=config.get("hidden_dim"))
 
     def __init__(self, num_actions, epsilon_schedule, test_epsilon,
-                             state_embedder_factory, gamma=0.99, action_type="d"):
+                             state_embedder_factory, gamma=0.99, action_type="d", hidden_dim=None):
         """DQNPolicy should typically be constructed via from_config, and not
         through the constructor.
 
@@ -258,10 +258,10 @@ class DQNPolicy(nn.Module):
             self._min_q = collections.deque(maxlen=1000)
         else:
             self.state_embedder, self.action_embedder = state_embedder_factory()
-            self._Q = NNDQN(num_actions, self.state_embedder, self.action_embedder)
-            self._target_Q = NNDQN(num_actions, *state_embedder_factory())
+            self._Q = NNDQN(num_actions, self.state_embedder, self.action_embedder, hidden_dim=hidden_dim )
+            self._target_Q = NNDQN(num_actions, *state_embedder_factory(), hidden_dim=hidden_dim)
             inpt_dim = self._Q.embed_dim
-            self.continuous_actor = Actor_NN(inpt_dim, num_actions, self.state_embedder)
+            self.continuous_actor = Actor_NN(inpt_dim, num_actions, self.state_embedder, hidden_dim=hidden_dim)
             self.target_q = collections.deque(maxlen=1000)
             
 
@@ -529,25 +529,29 @@ class DQN(nn.Module):
 
 class NNDQN(DQN):
     "DQN model for continous action spaces"
-    def __init__(self, num_actions, state_embedder, action_embedder=None, action_type="c"):
+    def __init__(self, num_actions, state_embedder, action_embedder=None, action_type="c", hidden_dim=1024):
         super().__init__(num_actions, state_embedder, action_embedder, action_type)
         self._state_embedder = state_embedder
         self._action_embedder = action_embedder
         self.embed_dim = state_embedder.embed_dim
+        
+
+        self.trunk = nn.Sequential(
+                nn.Linear(state_embedder.embed_dim+action_embedder.embed_dim),
+                nn.LayerNorm(hidden_dim), nn.Tanh())
 
         self.model = nn.Sequential(
-            nn.Linear(state_embedder.embed_dim+action_embedder.embed_dim, 256), nn.ReLU(),
-            nn.Linear(256, 1)
+            nn.Linear(hidden_dim, hidden_dim), nn.ReLU(),
+            nn.Linear(hidden_dim, 1)
         )
 
     def forward(self, states, actions):
-        print("NNDQN")
-        print(f"states:{states}")
+        
+        
         state_embed, _ = self._state_embedder(torch.stack(states))
         action_embed, _ = self._action_embedder((actions))
-        print(f"state_embed shape:{state_embed.shape}")
-        print(f"action_embed shape:{action_embed.shape}")
-        return self.model(torch.cat([state_embed, action_embed], dim=1))
+        x = self.trunk(torch.cat([state_embed, action_embed], dim=1))
+        return self.model(x)
 
 
 class DuelingNetwork(DQN):
@@ -603,11 +607,12 @@ def epsilon_greedy(q_values, epsilon, action_types="d", action_dim=None):
 
 class Actor_NN(nn.Module):
     "Actor model for continous action spaces"
-    def __init__(self, inpt_dim, output_dim, state_embedder):
+    def __init__(self, inpt_dim, output_dim, state_embedder, hidden_dim=1024):
         super().__init__()
-        hidden_dim = 128
+        self.trunk = nn.Sequential(nn.Linear(inpt_dim, hidden_dim),
+                                   nn.LayerNorm(hidden_dim), nn.Tanh())
         self.model = nn.Sequential(
-            nn.Linear(inpt_dim, hidden_dim ), nn.ReLU(),
+            nn.Linear(hidden_dim, hidden_dim ), nn.ReLU(),
         )
         self.head = nn.Linear(hidden_dim, output_dim)
         self._state_embedder = state_embedder
@@ -620,5 +625,7 @@ class Actor_NN(nn.Module):
     def forward(self, x):
         x = torch.tensor(x)
         x = self._state_embedder(x)[0].detach()
-        x =  self.head(self.model(x))
+        x = self.trunk(x)
+        x = self.model(x)
+        x =  self.head(x)
         return x
