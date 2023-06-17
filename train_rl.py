@@ -349,12 +349,6 @@ class Workspace:
 
                 # log
                 if b_idx % 5 == 0:
-                    name = self.args["name"]
-                    seed = self.args["seed"]
-                    base_path = "/home/fmohamed/"
-                    exp_dir = Path(os.path.join(f"{base_path}/experiments", f"{name}_seed_{seed}"))
-                    exp_dir.mkdir(exist_ok=True, parents=True)
-                    utils.record_options(self.args["name"], self.model, self.args["latent_n"], exp_dir, device=self.device)
                     results["grad_norm"] = grad_norm
                     train_stats, log_str, log_data = utils.log_train(
                         results, None, b_idx)
@@ -383,6 +377,13 @@ class Workspace:
                 torch.set_printoptions(threshold=100000)
 
                 if b_idx % 200 == 0:
+                    name = self.args["name"]
+                    seed = self.args["seed"]
+                    base_path = "/home/fmohamed/"
+                    exp_dir = Path(os.path.join(f"{base_path}/experiments", f"{name}_seed_{seed}"))
+                    exp_dir.mkdir(exist_ok=True, parents=True)
+                    utils.record_options(self.args["name"], self.model, self.args["latent_n"], exp_dir, device=self.device)
+                    
                     exp_dir = os.path.join(
                         "/home/fmohamed/love_experiments", self.args["name"], str(b_idx))
                     os.makedirs(exp_dir, exist_ok=True)
