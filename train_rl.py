@@ -377,13 +377,14 @@ class Workspace:
                 torch.set_printoptions(threshold=100000)
 
                 if b_idx % 200 == 0:
-                    name = self.args["name"]
-                    seed = self.args["seed"]
-                    base_path = "/home/fmohamed/"
-                    exp_dir = Path(os.path.join(f"{base_path}/experiments", f"{name}_seed_{seed}"))
-                    exp_dir.mkdir(exist_ok=True, parents=True)
-                    utils.record_options(self.args["name"], self.model, self.args["latent_n"], exp_dir, device=self.device)
-                    
+                    # viualize optons for maze environment
+                    if "maze" in self.args["namr"]:
+                        name = self.args["name"]
+                        seed = self.args["seed"]
+                        base_path = "/home/fmohamed/"
+                        exp_dir = Path(os.path.join(f"{base_path}/experiments", f"{name}_seed_{seed}"))
+                        exp_dir.mkdir(exist_ok=True, parents=True)
+                        utils.record_options(self.args["name"], self.model, self.args["latent_n"], exp_dir, device=self.device)
                     exp_dir = os.path.join(
                         "/home/fmohamed/love_experiments", self.args["name"], str(b_idx))
                     os.makedirs(exp_dir, exist_ok=True)
