@@ -364,16 +364,9 @@ class HierarchicalStateSpaceModel(nn.Module):
             #############################
 
             abs_belief = abs_post_fwd_list[t - 1] * 0
-            if self.action_type == "d":
-                vq_loss, z, perplexity, onehot_z, z_logit = self.post_abs_state(
-                    concat(abs_post_fwd_list[t - 1], abs_post_bwd_list[t])
-                )
-            else:
-                vq_loss, z, perplexity, onehot_z, z_logit = self.post_abs_state(
-                    concat(abs_post_fwd_list[t - 1], abs_post_bwd_list[t])
-                )
-                # print(f"onehot_z.shape:{onehot_z.shape}")
-                # print(f"z_logit.shape:{z_logit.shape}")
+            vq_loss, z, perplexity, onehot_z, z_logit = self.post_abs_state(
+                concat(abs_post_fwd_list[t - 1], abs_post_bwd_list[t])
+            )
 
             abs_state = read_data * z + copy_data * abs_state
 

@@ -328,7 +328,7 @@ class Workspace:
                 )
 
                 if self.args["coding_len_coeff"] > 0:
-                    if results["obs_cost"].mean() < 0.03:
+                    if results["obs_cost"].mean() < 0.05:
                         self.model.coding_len_coeff += 0.00002
                     elif b_idx > 0:
                         self.model.coding_len_coeff -= 0.00002
@@ -349,6 +349,10 @@ class Workspace:
 
                 # log
                 if b_idx % 5 == 0:
+                    base_path = "/home/fmohamed/"
+                    exp_dir = Path(os.path.join(f"{base_path}/experiments", f"{name}_seed_{seed}"))
+                    exp_dir.mkdir(exist_ok=True, parents=True)
+                    utils.record_options(self.args["name"], self.model, self.args["latent_n"], exp_dir)
                     results["grad_norm"] = grad_norm
                     train_stats, log_str, log_data = utils.log_train(
                         results, None, b_idx)

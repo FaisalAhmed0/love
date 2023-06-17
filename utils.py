@@ -13,6 +13,7 @@ from grid_world import grid
 
 import gym 
 import d4rl
+import mujoco_py
 
 FONT = ImageFont.truetype(
     os.path.join(os.path.dirname(__file__), "asset/fonts/arial.ttf"), 30
@@ -776,3 +777,22 @@ def d4rl_loader(batch_size, env_name):
         dataset=test_dataset, batch_size=len(test_dataset), shuffle=False
     )
     return train_loader, test_loader
+
+@torch.no_grad()
+def record_options(env_name, hssm, num_options, base_dir):
+    init_state = (np.array([2.90749422 , 4.92641686 ]), np.array([ 0.00, 0.00]))
+    all_options_images = []
+    eval_env = gym.make(env_name)
+    os.makedirs(base_dir / "options" / "eval_video", exist_ok=True)
+    for option in range(num_options):
+        total_reward = 0
+        state = eval_env.reset()
+        state = mujoco_py.cymj.MjSimState(time=0.0,
+                                            qpos=init_state[0], qvel=init_state[1], act=None, udd_state={})
+        eval_env.sim.set_state(state)
+        action, _ = hssm.play_z(option, torch.tensor(state)[None, :], )
+        action = action.cpu().detach().numpy()
+        state, reward, _,_ = eval_env.step(action)
+        print("passed successfully")
+        quit()
+
