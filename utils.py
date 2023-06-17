@@ -786,17 +786,21 @@ def record_options(env_name, hssm, num_options, base_dir):
     os.makedirs(base_dir / "options" / "eval_video", exist_ok=True)
     for option in range(num_options):
         total_reward = 0
-        state = eval_env.reset()
+        eval_env.reset()
         state = mujoco_py.cymj.MjSimState(time=0.0,
                                             qpos=init_state[0], qvel=init_state[1], act=None, udd_state={})
         eval_env.sim.set_state(state)
-        print(f"state:{state}")
-        # print(f"state.shapae:{state.shape}")
-        action, _ = hssm.state_model.play_z(option, torch.tensor(state)[None, :], )
-        print(f"action:{action}")
-        print(f"action.shape:{action.shape}")
-        action = action.cpu().detach().numpy()
-        state, reward, _,_ = eval_env.step(action)
-        print("passed successfully")
-        quit()
+        for i in range(1000):
+            if i == 0:
+                current_state = np.concatenate(init_state, axis=0)
+                print(f"state:{current_state}")
+            # print(f"state.shapae:{state.shape}")
+            action, _ = hssm.state_model.play_z(option, torch.tensor(current_state)[None, :], )
+            print(f"action:{action}")
+            print(f"action.shape:{action.shape}")
+            action = action.cpu().detach().numpy()
+            new_state, reward, _,_ = eval_env.step(action)
+            current_state = new_state
+            print("passed successfully")
+            quit()
 
