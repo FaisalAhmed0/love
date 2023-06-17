@@ -790,7 +790,11 @@ def record_options(env_name, hssm, num_options, base_dir):
         state = mujoco_py.cymj.MjSimState(time=0.0,
                                             qpos=init_state[0], qvel=init_state[1], act=None, udd_state={})
         eval_env.sim.set_state(state)
-        action, _ = hssm.play_z(option, torch.tensor(state)[None, :], )
+        print(f"state:{state}")
+        print(f"state.shapae:{state.shape}")
+        action, _ = hssm.state_model.play_z(option, torch.tensor(state)[None, :], )
+        print(f"action:{action}")
+        print(f"action.shape:{action.shape}")
         action = action.cpu().detach().numpy()
         state, reward, _,_ = eval_env.step(action)
         print("passed successfully")
