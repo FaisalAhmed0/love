@@ -349,6 +349,8 @@ class Workspace:
 
                 # log
                 if b_idx % 5 == 0:
+                    name = self.args["name"]
+                    seed = self.args["seed"]
                     base_path = "/home/fmohamed/"
                     exp_dir = Path(os.path.join(f"{base_path}/experiments", f"{name}_seed_{seed}"))
                     exp_dir.mkdir(exist_ok=True, parents=True)
