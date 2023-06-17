@@ -795,7 +795,7 @@ def record_options(env_name, hssm, num_options, base_dir, device):
                 current_state = np.concatenate(init_state, axis=0)
                 print(f"state:{current_state}")
             # print(f"state.shapae:{state.shape}")
-            action, _ = hssm.state_model.play_z(option, torch.tensor(current_state, device=device, dtype=torch.float32)[None, :], )
+            action, _ = hssm.state_model.play_z(option, torch.tensor(current_state, device=device, dtype=torch.float32), )
             print(f"action:{action}")
             print(f"action.shape:{action.shape}")
             action = action.cpu().detach().numpy()
