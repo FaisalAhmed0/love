@@ -791,7 +791,7 @@ def record_options(env_name, hssm, num_options, base_dir):
                                             qpos=init_state[0], qvel=init_state[1], act=None, udd_state={})
         eval_env.sim.set_state(state)
         print(f"state:{state}")
-        print(f"state.shapae:{state.shape}")
+        # print(f"state.shapae:{state.shape}")
         action, _ = hssm.state_model.play_z(option, torch.tensor(state)[None, :], )
         print(f"action:{action}")
         print(f"action.shape:{action.shape}")
