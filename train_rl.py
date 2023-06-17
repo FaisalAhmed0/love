@@ -378,7 +378,7 @@ class Workspace:
 
                 if b_idx % 10 == 0:
                     # viualize optons for maze environment
-                    if "maze" in self.args["namr"]:
+                    if "maze" in self.args["name"]:
                         name = self.args["name"]
                         seed = self.args["seed"]
                         base_path = "/home/fmohamed/"
