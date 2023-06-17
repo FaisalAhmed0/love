@@ -14,6 +14,7 @@ from grid_world import grid
 import gym 
 import d4rl
 import mujoco_py
+import cv2
 
 FONT = ImageFont.truetype(
     os.path.join(os.path.dirname(__file__), "asset/fonts/arial.ttf"), 30
@@ -790,6 +791,7 @@ def record_options(env_name, hssm, num_options, base_dir, device):
         state = mujoco_py.cymj.MjSimState(time=0.0,
                                             qpos=init_state[0], qvel=init_state[1], act=None, udd_state={})
         eval_env.sim.set_state(state)
+        frames = []
         for i in range(1000):
             if i == 0:
                 current_state = np.concatenate(init_state, axis=0)
@@ -801,6 +803,13 @@ def record_options(env_name, hssm, num_options, base_dir, device):
             action = action.cpu().detach().numpy()
             new_state, reward, _,_ = eval_env.step(action)
             current_state = new_state
-            print("passed successfully")
-            quit()
+            frames.append(eval_env.render("rgb_array"))
+        r = None
+        for i in range(10, len(frames)-1):
+            if i == 10:
+                r = cv2.bitwise_or(frames[i], frames[i+1])
+            else:
+                r = cv2.bitwise_or(r, frames[i+1])
+        wandb.log({f"Visualization/Option{option} Path": wandb.Image(r)})
+            
 
