@@ -384,7 +384,7 @@ class Workspace:
                         base_path = "/home/fmohamed/"
                         exp_dir = Path(os.path.join(f"{base_path}/experiments", f"{name}_seed_{seed}"))
                         exp_dir.mkdir(exist_ok=True, parents=True)
-                        utils.record_options(self.args["name"], self.model, self.args["latent_n"], exp_dir, device=self.device, step)
+                        utils.record_options(self.args["name"], self.model, self.args["latent_n"], exp_dir, device=self.device, step=b_idx)
                     exp_dir = os.path.join(
                         "/home/fmohamed/love_experiments", self.args["name"], str(b_idx))
                     os.makedirs(exp_dir, exist_ok=True)
