@@ -339,10 +339,8 @@ class DQNPolicy(nn.Module):
             next_state_q_values = self._target_Q(next_states, None)[0].gather(
                     1, best_actions).squeeze(1)
         else:
-            current_state_q_values = self._Q(states, actions)
-            # print(f"next_states")
-            # print(next_states)
-            # next_states = torch.stack(next_states)
+            current_state_q_values1, current_state_q_values2 = self._Q(states, actions)
+            current_state_q_values = torch.min(current_state_q_values1, current_state_q_values2)
             best_actions = self.continuous_actor(torch.stack(next_states))
             next_state_q_values = self._target_Q(next_states, best_actions).squeeze(1)
             self.target_q.append(next_state_q_values.mean().cpu().item())
@@ -360,9 +358,10 @@ class DQNPolicy(nn.Module):
         # compute actions given states
         actions = self.continuous_actor(torch.stack(states))
         # compute the Q values given the states and actions computed by the actor
-        q_values = self._Q(states, actions)
+        q_values1, q_values2 = self._Q(states, actions)
+        q_values = torch.min(q_values1, q_values2)
         # compute and return the actor loss
-        actor_loss = -q_values.mean()
+        actor_loss = -1 * q_values.mean()
         return actor_loss
 
     
@@ -540,7 +539,11 @@ class NNDQN(DQN):
                 nn.Linear(state_embedder.embed_dim+action_embedder.embed_dim),
                 nn.LayerNorm(hidden_dim), nn.Tanh())
 
-        self.model = nn.Sequential(
+        self.q1 = nn.Sequential(
+            nn.Linear(hidden_dim, hidden_dim), nn.ReLU(),
+            nn.Linear(hidden_dim, 1)
+        )
+        self.q2 = nn.Sequential(
             nn.Linear(hidden_dim, hidden_dim), nn.ReLU(),
             nn.Linear(hidden_dim, 1)
         )
@@ -551,7 +554,9 @@ class NNDQN(DQN):
         state_embed, _ = self._state_embedder(torch.stack(states))
         action_embed, _ = self._action_embedder((actions))
         x = self.trunk(torch.cat([state_embed, action_embed], dim=1))
-        return self.model(x)
+        x1 = self.q1(x)
+        x2 = self.q1(x)
+        return x1, x2
 
 
 class DuelingNetwork(DQN):
