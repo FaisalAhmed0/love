@@ -275,7 +275,7 @@ def main(params=None, config_bindings=None):
                     total_steps)
             
             render = np.transpose(np.array(render),(0,3,1,2))
-            wandb.log({'eval/video': wandb.Video(render[::8,:,::2,::2], fps=6,format="gif")}, steps=total_steps)
+            wandb.log({'eval/video': wandb.Video(render[::8,:,::2,::2], fps=6,format="gif")}, step=total_steps)
             
             for k, v in agent.stats.items():
                 if v is not None:
