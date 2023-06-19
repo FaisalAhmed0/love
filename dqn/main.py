@@ -247,7 +247,7 @@ def main(params=None, config_bindings=None):
         total_steps += sum(exp.info.get("steps", 1) for exp in episode)
         train_rewards.append(sum(exp.reward for exp in episode))
 
-        if episode_num % 10 == 0:
+        if episode_num % 1 == 0:
             return_render = episode_num % 100 == 0
             episode, render = run_episode(
                     env, agent, test=True, return_render=False)
@@ -260,7 +260,7 @@ def main(params=None, config_bindings=None):
             #                    duration=750, loop=0, optimize=True, quality=20)
 
         
-        if episode_num % 50 == 0:
+        if episode_num % 1 == 0:
             print("Here")
             tb_writer.add_scalar(
                     "reward/train", np.mean(train_rewards), episode_num,
