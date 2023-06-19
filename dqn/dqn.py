@@ -340,16 +340,18 @@ class DQNPolicy(nn.Module):
                     1, best_actions).squeeze(1)
         else:
             current_state_q_values1, current_state_q_values2 = self._Q(states, actions)
-            current_state_q_values = torch.min(current_state_q_values1, current_state_q_values2)
+            
             best_actions = self.continuous_actor(torch.stack(next_states))
-            next_state_q_values = self._target_Q(next_states, best_actions).squeeze(1)
+            next_state_q_values1, next_state_q_values2  = self._target_Q(next_states, best_actions).squeeze(1)
+            next_state_q_values = torch.min(next_state_q_values1, next_state_q_values2)
             self.target_q.append(next_state_q_values.mean().cpu().item())
         targets = rewards + self._gamma * (
             next_state_q_values * not_done_mask.float())
         targets.detach_()  # Don't backprop through targets
 
-        td_error = current_state_q_values.squeeze() - targets
-        loss = torch.mean((td_error ** 2) * weights)
+        td_error1 = current_state_q_values1.squeeze() - targets
+        td_error2 = current_state_q_values2.squeeze() - targets
+        loss = torch.mean((td_error1 ** 2) * weights) + torch.mean((td_error2 ** 2) * weights)
         self._losses["td_error"].append(loss.detach().cpu().data.numpy())
         return loss
 
@@ -555,7 +557,7 @@ class NNDQN(DQN):
         action_embed, _ = self._action_embedder((actions))
         x = self.trunk(torch.cat([state_embed, action_embed], dim=1))
         x1 = self.q1(x)
-        x2 = self.q1(x)
+        x2 = self.q2(x)
         return x1, x2
 
 
