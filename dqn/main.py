@@ -28,7 +28,7 @@ def eval(env, option, hssm, num_eps=10):
     returns = []
     for _ in range(num_eps):
         total_reward = 0
-        state = env.reset()
+        state = torch.tensor(env.reset(), device="cuda", dtype=torch.float32)
         hidden_state = None
         for _ in range(1000):
             action, next_hidden_state = hssm.play_z(
@@ -36,7 +36,7 @@ def eval(env, option, hssm, num_eps=10):
                     recurrent=False)
             next_state, reward, done, info = env.step(action.cpu().detach())
             total_reward += reward
-            state = next_state
+            state = torch.tensor(next_state, device="cuda", dtype=torch.float32)
             hidden_state = next_hidden_state
         returns.append(total_reward)
     return np.mean(returns), np.std(returns)
