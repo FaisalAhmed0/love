@@ -342,8 +342,8 @@ class DQNPolicy(nn.Module):
             current_state_q_values1, current_state_q_values2 = self._Q(states, actions)
             
             best_actions = self.continuous_actor(torch.stack(next_states))
-            next_state_q_values1, next_state_q_values2  = self._target_Q(next_states, best_actions).squeeze(1)
-            next_state_q_values = torch.min(next_state_q_values1, next_state_q_values2)
+            next_state_q_values1, next_state_q_values2  = self._target_Q(next_states, best_actions)
+            next_state_q_values = torch.min(next_state_q_values1.squeeze(1), next_state_q_values2.squeeze(1))
             self.target_q.append(next_state_q_values.mean().cpu().item())
         targets = rewards + self._gamma * (
             next_state_q_values * not_done_mask.float())
