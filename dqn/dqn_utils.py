@@ -47,5 +47,5 @@ class EpisodeAndStepWriter_wandb(object):
     def __init__(self, log_dir):
         pass
     def add_scalar(self, key, value, episode, step):
-        wandb.log({key: value}, step=episode)
+        # wandb.log({key: value}, step=episode)
         wandb.log({key: value}, step=step)
