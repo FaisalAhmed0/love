@@ -23,8 +23,8 @@
         "pre_training": false
   },
     "config_bindings":[
-      "agent.policy.epsilon_schedule.total_steps=500000",
-      "checkpoint=\"experiments/maze2d-open-v0_seed_89/model-10000.ckpt\"",
+      "agent.policy.epsilon_schedule.total_steps=100000",
+      "checkpoint=\"/home/fmohamed/experiments/maze2d-open-v0_seed_89/model-10000.ckpt\"",
       "threshold=0",
       "sparse_reward=True",
       "visit_length=3",
