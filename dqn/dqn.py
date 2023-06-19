@@ -635,4 +635,5 @@ class Actor_NN(nn.Module):
         x = self.trunk(x)
         x = self.model(x)
         x =  self.head(x)
+        x = torch.tanh(x)
         return x
