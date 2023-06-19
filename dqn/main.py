@@ -26,9 +26,10 @@ import wandb
 
 def eval(env, option, hssm, num_eps=10):
     returns = []
+    device = "cuda:0" if torch.cuda.is_available() else "cpu"
     for _ in range(num_eps):
         total_reward = 0
-        state = torch.tensor(env.reset(), device="cuda", dtype=torch.float32)
+        state = torch.tensor(env.reset(), device=device, dtype=torch.float32)
         hidden_state = None
         for _ in range(1000):
             action, next_hidden_state = hssm.play_z(
@@ -36,7 +37,7 @@ def eval(env, option, hssm, num_eps=10):
                     recurrent=False)
             next_state, reward, done, info = env.step(action.cpu().detach())
             total_reward += reward
-            state = torch.tensor(next_state, device="cuda", dtype=torch.float32)
+            state = torch.tensor(next_state, device=device, dtype=torch.float32)
             hidden_state = next_hidden_state
         returns.append(total_reward)
     return np.mean(returns), np.std(returns)
@@ -209,8 +210,7 @@ def main(params=None, config_bindings=None):
     hssm = torch.load(config.get("checkpoint")).cpu()
     hssm._use_min_length_boundary_mask = True
     hssm.eval()
-    best_option(config.get("env"), 10, hssm, 10)
-    quit()
+    
 
     if config.get("env") == "compile":
         env = grid.ComPILEEnv(
@@ -258,6 +258,8 @@ def main(params=None, config_bindings=None):
     print("Device: {}".format(device))
 
     agent = dqn.DQNAgent.from_config(config.get("agent"), env)
+    best_option(config.get("env"), 10, hssm, 10)
+    quit()
 
     # Behavior Cloning
     if config.get("bc"):
