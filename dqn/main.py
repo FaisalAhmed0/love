@@ -154,8 +154,8 @@ def main(params=None, config_bindings=None):
         for key in params:
             args[key] = params[key]
     name = args["exp_name"]
-    path = args["checkpoint"]
-    args["config_bindings"].append(f"checkpoint=\"{path}\"")
+    # path = args["checkpoint"]
+    # args["config_bindings"].append(f"checkpoint=\"{path}\"")
     print(f"name: {name}")
     # try:
     if config_bindings:
