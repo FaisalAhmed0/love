@@ -28,6 +28,8 @@ def eval(env, option, hssm, num_eps=10):
     returns = []
     for _ in range(num_eps):
         total_reward = 0
+        state = env.reset()
+        hidden_state = None
         for _ in range(1000):
             action, next_hidden_state = hssm.play_z(
                     option, state, hidden_state,
