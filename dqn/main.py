@@ -153,11 +153,13 @@ def main(params=None, config_bindings=None):
             f.write("\n\n")
 
     uid = wandb.util.generate_id()
+    name = args["env"]
+    seed = args["seed"]
     wandb.init(
         id = uid,
         resume="allow",
         project="love",
-        name=args["exp_name"],
+        name=f"env:{env}_seed:{seed}_finetune",
         sync_tensorboard=False,
         settings=wandb.Settings(start_method="fork"),
     )
