@@ -1,6 +1,6 @@
 {
-  "optimization_procedure_name": "love_test_finetuning",
-    "results_dir": "/fast/fmohamed/love_test_finetuning",
+  "optimization_procedure_name": "love_test_finetuning_seed2",
+    "results_dir": "/fast/fmohamed/love_test_finetuning_seed2",
     "git_params": {
       "branch": "main",
       "commit": null
