@@ -536,7 +536,7 @@ class NNDQN(DQN):
         
 
         self.trunk = nn.Sequential(
-                nn.Linear(state_embedder.embed_dim+action_embedder.embed_dim),
+                nn.Linear(state_embedder.embed_dim+action_embedder.embed_dim, hidden_dim),
                 nn.LayerNorm(hidden_dim), nn.Tanh())
 
         self.q1 = nn.Sequential(
