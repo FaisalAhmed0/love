@@ -241,7 +241,7 @@ def main(params=None, config_bindings=None):
     visualize_dir = os.path.join(exp_dir, "visualize")
     os.makedirs(visualize_dir, exist_ok=False)
     for episode_num in tqdm.tqdm(range(150000)):
-        episode, _ = run_episode(
+        episode= run_episode(
             env, agent, experience_observers=[agent.update], return_render=False)[0]
 
         total_steps += sum(exp.info.get("steps", 1) for exp in episode)
