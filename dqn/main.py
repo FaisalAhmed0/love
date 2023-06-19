@@ -159,7 +159,7 @@ def main(params=None, config_bindings=None):
         id = uid,
         resume="allow",
         project="love",
-        name=f"env:{env}_seed:{seed}_finetune",
+        name=f"env:{name}_seed:{seed}_finetune",
         sync_tensorboard=False,
         settings=wandb.Settings(start_method="fork"),
     )
