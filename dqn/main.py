@@ -252,12 +252,12 @@ def main(params=None, config_bindings=None):
             episode, render = run_episode(
                     env, agent, test=True, return_render=False)
             test_rewards.append(sum(exp.reward for exp in episode))
-            if True:
-                frames = [frame.image() for frame in render]
-                episodic_returns = sum(exp.reward for exp in episode)
-                save_path = os.path.join(visualize_dir, f"{episode_num}.gif")
-                frames[0].save(save_path, save_all=True, append_images=frames[1:],
-                               duration=750, loop=0, optimize=True, quality=20)
+            # if True:
+            #     frames = [frame.image() for frame in render]
+            #     episodic_returns = sum(exp.reward for exp in episode)
+            #     save_path = os.path.join(visualize_dir, f"{episode_num}.gif")
+            #     frames[0].save(save_path, save_all=True, append_images=frames[1:],
+            #                    duration=750, loop=0, optimize=True, quality=20)
 
         if episode_num % 50 == 0:
             tb_writer.add_scalar(
@@ -273,7 +273,7 @@ def main(params=None, config_bindings=None):
             wandb_writer.add_scalar(
                     "reward/test", np.mean(train_rewards), episode_num,
                     total_steps)
-            wandb.log({'eval/video': wandb.Video(frames[::8,:,::2,::2], fps=6,format="gif")})
+            wandb.log({'eval/video': wandb.Video(render[::8,:,::2,::2], fps=6,format="gif")})
 
             for k, v in agent.stats.items():
                 if v is not None:
