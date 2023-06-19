@@ -273,8 +273,10 @@ def main(params=None, config_bindings=None):
             wandb_writer.add_scalar(
                     "reward/test", np.mean(train_rewards), episode_num,
                     total_steps)
+            
+            print(render)
             wandb.log({'eval/video': wandb.Video(render[::8,:,::2,::2], fps=6,format="gif")})
-
+            
             for k, v in agent.stats.items():
                 if v is not None:
                     tb_writer.add_scalar(k, v, episode_num, total_steps)

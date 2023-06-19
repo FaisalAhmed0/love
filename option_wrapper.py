@@ -189,7 +189,7 @@ class OptionWrapperContinous(gym.Wrapper):
         if low_level_control_prob > option_selection_prob:
             state, reward, done, info = self.env.step(action[len(self._permitted_zs)+1:])
             self._current_state = state
-            return state, reward, done, info
+            return state, reward, done, info, frames
 
         # Taking an option as an action
         # Follows the option until the option terminates
