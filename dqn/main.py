@@ -271,7 +271,7 @@ def main(params=None, config_bindings=None):
                     "reward/test", np.mean(test_rewards), episode_num,
                     total_steps)
             wandb_writer.add_scalar(
-                    "reward/test", np.mean(train_rewards), episode_num,
+                    "reward/test", np.mean(test_rewards), episode_num,
                     total_steps)
             
             render = np.transpose(np.array(render),(0,3,1,2))
