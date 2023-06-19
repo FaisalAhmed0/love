@@ -54,12 +54,14 @@ def run_episode(env, policy, experience_observers=None, test=False,
     episode = []
     state = env.reset()
     timestep = 0
+    frames = [env.render("rgb_array")]
     # renders = [maybe_render(env, state[1], None, 0, {}, timestep)]
     hidden_state = None
     while True:
         # print(f"state in main:{state}")
+        len_before = len(frames)
         action, next_hidden_state = policy.act(state, hidden_state, test=test)
-        next_state, reward, done, info = env.step(action)
+        next_state, reward, done, info, frames = env.step(action, frames)
         timestep += 1
         # renders.append(maybe_render(env, next_state[1], action, reward, info, timestep))
         experience = rl.Experience(
@@ -74,8 +76,10 @@ def run_episode(env, policy, experience_observers=None, test=False,
 
         state = next_state
         hidden_state = next_hidden_state
+        if len(frames) == len_before:
+            frames.append(env.render("rgb_array"))
         if done:
-            return episode, None
+            return episode, frames
 
 
 def main(params=None, config_bindings=None):
@@ -237,7 +241,7 @@ def main(params=None, config_bindings=None):
     visualize_dir = os.path.join(exp_dir, "visualize")
     os.makedirs(visualize_dir, exist_ok=False)
     for episode_num in tqdm.tqdm(range(150000)):
-        episode = run_episode(
+        episode, _ = run_episode(
             env, agent, experience_observers=[agent.update], return_render=False)[0]
 
         total_steps += sum(exp.info.get("steps", 1) for exp in episode)
@@ -248,7 +252,7 @@ def main(params=None, config_bindings=None):
             episode, render = run_episode(
                     env, agent, test=True, return_render=False)
             test_rewards.append(sum(exp.reward for exp in episode))
-            if False:
+            if True:
                 frames = [frame.image() for frame in render]
                 episodic_returns = sum(exp.reward for exp in episode)
                 save_path = os.path.join(visualize_dir, f"{episode_num}.gif")
@@ -269,6 +273,7 @@ def main(params=None, config_bindings=None):
             wandb_writer.add_scalar(
                     "reward/test", np.mean(train_rewards), episode_num,
                     total_steps)
+            wandb.log({'eval/video': wandb.Video(frames[::8,:,::2,::2], fps=6,format="gif")})
 
             for k, v in agent.stats.items():
                 if v is not None:

@@ -13,6 +13,7 @@ import gym
 from torch.nn import functional as F
 import tqdm
 from grid_world import grid
+from distributions import SquashedDiagGaussianDistribution
 # from world3d import world3d
 
 '''TODO: For the DQNAgent class you should add the following:
@@ -341,7 +342,9 @@ class DQNPolicy(nn.Module):
         else:
             current_state_q_values1, current_state_q_values2 = self._Q(states, actions)
             
-            best_actions = self.continuous_actor(torch.stack(next_states))
+            mu, log_std = self.continuous_actor(torch.stack(next_states))
+            dist = SquashedDiagGaussianDistribution(self.continuous_actor.action_dim)
+            best_actions, _ = dist.log_prob_from_params(mu,log_std)
             next_state_q_values1, next_state_q_values2  = self._target_Q(next_states, best_actions)
             next_state_q_values = torch.min(next_state_q_values1.squeeze(1), next_state_q_values2.squeeze(1))
             self.target_q.append(next_state_q_values.mean().cpu().item())
@@ -358,7 +361,9 @@ class DQNPolicy(nn.Module):
     def actor_loss(self, experiences):
         states = [e.state for e in experiences]
         # compute actions given states
-        actions = self.continuous_actor(torch.stack(states))
+        mu, log_std = self.continuous_actor(torch.stack(states))
+        dist = SquashedDiagGaussianDistribution(self.continuous_actor.action_dim)
+        actions, _ = dist.log_prob_from_params(mu,log_std)
         # compute the Q values given the states and actions computed by the actor
         q_values1, q_values2 = self._Q(states, actions)
         q_values = torch.min(q_values1, q_values2)
@@ -616,17 +621,19 @@ class Actor_NN(nn.Module):
     "Actor model for continous action spaces"
     def __init__(self, inpt_dim, output_dim, state_embedder, hidden_dim=1024):
         super().__init__()
+        self.action_dim = output_dim
         self.trunk = nn.Sequential(nn.Linear(inpt_dim, hidden_dim),
                                    nn.LayerNorm(hidden_dim), nn.Tanh())
         self.model = nn.Sequential(
             nn.Linear(hidden_dim, hidden_dim ), nn.ReLU(),
         )
         self.head = nn.Linear(hidden_dim, output_dim)
+        self.log_std = nn.Linear(hidden_dim, output_dim)
         self._state_embedder = state_embedder
-        print(f"Actor")
-        print(f"_state_embedder:{self._state_embedder}")
-        print(f"model:{self.model}")
-        print(f"head:{self.head}")
+        # print(f"Actor")
+        # print(f"_state_embedder:{self._state_embedder}")
+        # print(f"model:{self.model}")
+        # print(f"head:{self.head}")
         
 
     def forward(self, x):
@@ -634,6 +641,6 @@ class Actor_NN(nn.Module):
         x = self._state_embedder(x)[0].detach()
         x = self.trunk(x)
         x = self.model(x)
-        x =  self.head(x)
-        x = torch.tanh(x)
-        return x
+        mu =  self.head(x)
+        log_std = torch.clamp(self.log_std(x), -20, 2)       
+        return mu, log_std

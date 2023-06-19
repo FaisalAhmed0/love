@@ -177,12 +177,12 @@ class OptionWrapperContinous(gym.Wrapper):
         self._boundary_state = None
         self._recurrent = recurrent
 
-    def step(self, action):
+    def step(self, action, frames):
         # if "tensor" in str(type(action)):
         #     action = action.cpu().detach().numpy()
         # Default low-level actions
         # compute the porbability of the complement
-        print(action)
+        # print(action)
         options_probs = self.softmax(action[:len(self._permitted_zs)+1])
         option_selection_prob = options_probs[:-1].sum()
         low_level_control_prob = 1 - option_selection_prob
@@ -205,6 +205,7 @@ class OptionWrapperContinous(gym.Wrapper):
                     z, state, hidden_state,
                     recurrent=self._recurrent)
             next_state, reward, done, info = self.env.step(action.cpu().detach())
+            frames.append(self.env.render("rgb_array"))
             low_level_actions.append(action)
             total_reward += reward
             terminate, self._boundary_state = self._hssm.z_terminates(
@@ -217,7 +218,7 @@ class OptionWrapperContinous(gym.Wrapper):
         self._current_state = state
         info["low_level_actions"] = low_level_actions
         info["steps"] = len(low_level_actions)
-        return state, total_reward, done, info
+        return state, total_reward, done, info, frames
 
     def reset(self):
         self._current_state = self.env.reset()
