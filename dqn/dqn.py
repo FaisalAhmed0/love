@@ -298,9 +298,11 @@ class DQNPolicy(nn.Module):
             return epsilon_greedy(q_values, epsilon)[0], None
         else:
             # This may cause an error
-            print(f"state shape:{state.shape}")
+            # print(f"state shape:{state.shape}")
             if len(state.shape) == 1: state=state[None, :]
-            actions = self.continuous_actor(state)
+            mu, log_std = self.continuous_actor(state)
+            dist = SquashedDiagGaussianDistribution(self.continuous_actor.action_dim)
+            actions, _ = dist.log_prob_from_params(mu,log_std)
             return epsilon_greedy(actions, epsilon, action_types=self._action_type,action_dim=self._num_actions)[0], None
 
 
