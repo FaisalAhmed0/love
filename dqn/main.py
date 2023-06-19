@@ -274,9 +274,8 @@ def main(params=None, config_bindings=None):
                     "reward/test", np.mean(train_rewards), episode_num,
                     total_steps)
             
-            print(render)
             render = np.transpose(np.array(render),(0,3,1,2))
-            wandb.log({'eval/video': wandb.Video(render[::8,:,::2,::2], fps=6,format="gif")})
+            wandb.log({'eval/video': wandb.Video(render[::8,:,::2,::2], fps=6,format="gif")}, steps=total_steps)
             
             for k, v in agent.stats.items():
                 if v is not None:

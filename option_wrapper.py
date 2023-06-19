@@ -176,6 +176,7 @@ class OptionWrapperContinous(gym.Wrapper):
         self._current_state = None
         self._boundary_state = None
         self._recurrent = recurrent
+        
 
     def step(self, action, frames):
         # if "tensor" in str(type(action)):
@@ -189,6 +190,10 @@ class OptionWrapperContinous(gym.Wrapper):
         if low_level_control_prob > option_selection_prob:
             state, reward, done, info = self.env.step(action[len(self._permitted_zs)+1:])
             self._current_state = state
+            self.t += 1
+            done = False
+            if self.t == 1000:
+                done = True
             return state, reward, done, info, frames
 
         # Taking an option as an action
@@ -205,6 +210,8 @@ class OptionWrapperContinous(gym.Wrapper):
                     z, state, hidden_state,
                     recurrent=self._recurrent)
             next_state, reward, done, info = self.env.step(action.cpu().detach())
+            self.t += 1
+            done = False
             frames.append(self.env.render("rgb_array"))
             low_level_actions.append(action)
             total_reward += reward
@@ -218,10 +225,13 @@ class OptionWrapperContinous(gym.Wrapper):
         self._current_state = state
         info["low_level_actions"] = low_level_actions
         info["steps"] = len(low_level_actions)
+        if self.t == 1000:
+            done = True
         return state, total_reward, done, info, frames
 
     def reset(self):
         self._current_state = self.env.reset()
+        self.t = 0
         return self._current_state
     
     def softmax(self, x):
