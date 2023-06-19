@@ -33,16 +33,16 @@
     ],
   "hyperparam_list":[
     {
-      "param": ["checkpoint", "seed"],
-      "values":[["/home/fmohamed/experiments/maze2d-open-v0_seed_1/model-20000.ckpt, 1"], ["/home/fmohamed/experiments/maze2d-open-v0_seed_1233/model-20000.ckpt, 1233"], ["/home/fmohamed/experiments/maze2d-open-v0_seed_545894795/model-20000.ckpt, 545894795"]]
-    },
-    {
       "param": "configs",
       "values":[["/home/fmohamed/love/configs/default.json"]]
     },
     {
       "param": "base_dir",
       "values":["experiments_finetune"]
+    },
+    {
+      "param": "[checkpoint, seed]",
+      "values":[["/home/fmohamed/experiments/maze2d-open-v0_seed_1/model-20000.ckpt", 1], ["/home/fmohamed/experiments/maze2d-open-v0_seed_1233/model-20000.ckpt", 1233], ["/home/fmohamed/experiments/maze2d-open-v0_seed_545894795/model-20000.ckpt", 545894795]]
     },
     {
       "param": "force_overwrite",
