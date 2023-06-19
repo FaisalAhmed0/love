@@ -153,7 +153,7 @@ def main(params=None, config_bindings=None):
             f.write("\n\n")
 
     uid = wandb.util.generate_id()
-    name = config["env"]
+    name = config.get("env")
     seed = args["seed"]
     wandb.init(
         id = uid,
