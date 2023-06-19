@@ -259,6 +259,7 @@ def main(params=None, config_bindings=None):
             #     frames[0].save(save_path, save_all=True, append_images=frames[1:],
             #                    duration=750, loop=0, optimize=True, quality=20)
 
+        
         if episode_num % 50 == 0:
             print("Here")
             tb_writer.add_scalar(
@@ -281,6 +282,8 @@ def main(params=None, config_bindings=None):
             for k, v in agent.stats.items():
                 if v is not None:
                     tb_writer.add_scalar(k, v, episode_num, total_steps)
+        if total_steps >= 100000:
+            break
 
 
 if __name__ == '__main__':
