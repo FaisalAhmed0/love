@@ -154,6 +154,8 @@ def main(params=None, config_bindings=None):
         for key in params:
             args[key] = params[key]
     name = args["exp_name"]
+    path = args["checkpoint"]
+    args["config_bindings"].append(f"checkpoint=\"{path}\"")
     print(f"name: {name}")
     # try:
     if config_bindings:
@@ -199,7 +201,8 @@ def main(params=None, config_bindings=None):
         id = uid,
         resume="allow",
         project="love",
-        name=f"env:{name}_seed:{seed}_finetune",
+        name=f"env:{name}_seed:{seed}_finetune_new_goal",
+        group=f"env:{name}_seed:{seed}_finetune_new_goal",
         sync_tensorboard=False,
         settings=wandb.Settings(start_method="fork"),
     )
