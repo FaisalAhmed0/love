@@ -261,8 +261,8 @@ def main(params=None, config_bindings=None):
     print("Device: {}".format(device))
 
     agent = dqn.DQNAgent.from_config(config.get("agent"), env)
-    best_option(config.get("env"), 10, hssm, 10)
-    quit()
+    # best_option(config.get("env"), 10, hssm, 10)
+    # quit()
 
     # Behavior Cloning
     if config.get("bc"):
