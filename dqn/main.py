@@ -24,6 +24,41 @@ import utils
 import wandb
 
 
+def eval(env, option, hssm, num_eps=10):
+    returns = []
+    for _ in range(num_eps):
+        total_reward = 0
+        for _ in range(1000):
+            action, next_hidden_state = hssm.play_z(
+                    option, state, hidden_state,
+                    recurrent=False)
+            next_state, reward, done, info = env.step(action.cpu().detach())
+            total_reward += reward
+            state = next_state
+            hidden_state = next_hidden_state
+        returns.append(total_reward)
+    return np.mean(returns), np.std(returns)
+
+
+
+def best_option(env_name, num_options, hssm, num_eps=10):
+    env = gym.make(env_name)
+    max_return = 0
+    max_option = 0
+    for option in range(num_options):
+        average_return, return_std = eval(env, option, hssm, num_eps)
+        if average_return > max_return:
+            print(f"New max return:{average_return}, std:{return_std}, option:{option}")
+            max_return = average_return
+            max_option = option
+    print(f"Best option:{max_option}, average return:{average_return}, std:{return_std}")
+    return max_option
+
+        
+        
+
+
+
 def run_episode(env, policy, experience_observers=None, test=False,
                 return_render=False):
     """Runs a single episode on the environment following the policy.
@@ -131,6 +166,8 @@ def main(params=None, config_bindings=None):
     np.random.seed(args["seed"])
     torch.manual_seed(args["seed"])
 
+    
+
     exp_dir = os.path.join(os.path.expanduser(args["base_dir"]), args["exp_name"])
     if os.path.exists(exp_dir) and not args["force_overwrite"]:
         raise ValueError("Experiment already exists at: {}".format(exp_dir))
@@ -170,6 +207,8 @@ def main(params=None, config_bindings=None):
     hssm = torch.load(config.get("checkpoint")).cpu()
     hssm._use_min_length_boundary_mask = True
     hssm.eval()
+    best_option(config.get("env"), 10, hssm, 10)
+    quit()
 
     if config.get("env") == "compile":
         env = grid.ComPILEEnv(
