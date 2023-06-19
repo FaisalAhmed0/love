@@ -1,6 +1,6 @@
 {
-  "optimization_procedure_name": "love_test_finetuning_seed2_new_task",
-    "results_dir": "/fast/fmohamed/love_test_finetuning_seed2_new_task",
+  "optimization_procedure_name": "love_test_finetuning_seed3_new_task",
+    "results_dir": "/fast/fmohamed/love_test_finetuning_seed3_new_task",
     "git_params": {
       "branch": "main",
       "commit": null
@@ -24,7 +24,7 @@
   },
     "config_bindings":[
       "agent.policy.epsilon_schedule.total_steps=1",
-      "checkpoint=\"/home/fmohamed/experiments/maze2d-open-v0_seed_1233/model-20000.ckpt\"",
+      "checkpoint=\"/home/fmohamed/experiments/maze2d-open-v0_seed_545894795/model-20000.ckpt\"",
       "threshold=0",
       "sparse_reward=True",
       "visit_length=3",
@@ -43,7 +43,7 @@
     },
     {
       "param": "checkpoint",
-      "values":["/home/fmohamed/experiments/maze2d-open-v0_seed_1233/model-20000.ckpt"]
+      "values":["/home/fmohamed/experiments/maze2d-open-v0_seed_545894795/model-20000.ckpt"]
     },
     {
       "param": "force_overwrite",
@@ -51,7 +51,7 @@
     },
     {
       "param": "seed",
-      "values":[1233]
+      "values":[545894795]
     },
     {
       "param": "exp_name", 
