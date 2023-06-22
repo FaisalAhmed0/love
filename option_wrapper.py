@@ -148,6 +148,7 @@ class OptionWrapperContinous(gym.Wrapper):
         super().__init__(TensorWrapperD4RL(env))
 
         self._hssm = hssm
+        print("I am in the continuous wrapper")
 
         # Compute z's on which HSSM has support over threshold:
         # i.e., {z | p(z) > threshold}
