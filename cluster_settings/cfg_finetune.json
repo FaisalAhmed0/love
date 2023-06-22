@@ -24,6 +24,10 @@
   },
   "hyperparam_list":[
     {
+      "param": "seed",
+      "values":[1, 1233]
+    },
+    {
       "param": "configs",
       "values":[["/home/fmohamed/love/configs/default.json"]]
     },
@@ -34,10 +38,6 @@
     {
       "param": "force_overwrite",
       "values":[false]
-    },
-    {
-      "param": "seed",
-      "values":[1, 1233]
     },
     {
       "param": "exp_name", 

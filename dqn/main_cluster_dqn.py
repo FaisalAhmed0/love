@@ -11,10 +11,10 @@ os.environ['PYTHONPATH'] = '/home/fmohamed/love'
 
 
 def main_cluster():
+    hyperparams = read_params_from_cmdline()
     with open("/home/fmohamed/love/cluster_settings/cfg_finetune.json") as f:
         all_parma = json.load(f)
     print(f"all_parma:{all_parma}")
-    hyperparams = read_params_from_cmdline()
     exitcode = main(hyperparams, all_parma["config_bindings"])
     if exitcode == 3:
         return exit_for_resume()
