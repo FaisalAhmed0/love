@@ -114,9 +114,10 @@ class DQNAgent(object):
                 # update the actor model 
                 if self._actor_optimizer:
                     self._actor_optimizer.zero_grad()
-                    loss = self._dqn.actor_loss(experiences)
-                    loss.backward()
+                    actor_loss = self._dqn.actor_loss(experiences)
+                    actor_loss.backward()
                     self._actor_losses.append(loss.item())
+                    self._actor_optimizer.step()
 
 
                 # clip according to the max allowed grad norm
