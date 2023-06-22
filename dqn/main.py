@@ -191,7 +191,8 @@ def main(params=None, config_bindings=None):
     #     args["config_bindings"]  = config_bindings
     assert args["exp_name"] is not None
     seed_arg = args["seed"]
-    args["exp_name"] = f"testing_seed_{seed_arg}"
+    group_name = args["exp_name"]
+    args["exp_name"] = args["exp_name"] + f"_seed_{seed_arg}"
     config = cfg.Config.from_files_and_bindings(
             args["configs"], args["config_bindings"])
     # except Exception as error:
@@ -232,8 +233,8 @@ def main(params=None, config_bindings=None):
         id = uid,
         resume="allow",
         project="love",
-        name=f"env:{name}_seed:{seed}_finetune_goal_lower_right1_wiht_options_and_low_level_actions",
-        group=f"env:{name}_finetune_goal_lower_right",
+        name=f"env:{name}_" + args["exp_name"],
+        group=group_name,
         sync_tensorboard=False,
         settings=wandb.Settings(start_method="fork"),
     )

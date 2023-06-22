@@ -24,7 +24,7 @@
   "hyperparam_list":[
     {
       "param": "seed",
-      "values":[1, 1233]
+      "values":[1, 1233, 545894795]
     },
     {
       "param": "configs",
@@ -40,7 +40,7 @@
     },
     {
       "param": "exp_name", 
-      "values":["testing2"]
+      "values":["finetune_goal_lower_right"]
     }
   ]
 }
