@@ -190,6 +190,8 @@ def main(params=None, config_bindings=None):
     # if config_bindings:
     #     args["config_bindings"]  = config_bindings
     assert args["exp_name"] is not None
+    seed_arg = args["seed"]
+    args["exp_name"] = f"testing_seed_{seed_arg}"
     config = cfg.Config.from_files_and_bindings(
             args["configs"], args["config_bindings"])
     # except Exception as error:
