@@ -208,7 +208,7 @@ def main(params=None, config_bindings=None):
         id = uid,
         resume="allow",
         project="love",
-        name=f"env:{name}_seed:{seed}_finetune_goal_lower_right",
+        name=f"env:{name}_seed:{seed}_finetune_goal_lower_right1",
         group=f"env:{name}_finetune_goal_lower_right",
         sync_tensorboard=False,
         settings=wandb.Settings(start_method="fork"),
