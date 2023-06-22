@@ -182,13 +182,13 @@ def main(params=None, config_bindings=None):
     seed_path_checkpoint = default_path[ :seed_ind ] + str(args["seed"]) + default_path[ default_path[seed_ind:].index("/")+seed_ind:]
     args["checkpoint"] = seed_path_checkpoint
     print(f"seed_path_checkpoint:{seed_path_checkpoint}")
-    quit()
+    # quit()
     # path = args["checkpoint"]
     # args["config_bindings"].append(f"checkpoint=\"{path}\"")
     print(f"name: {name}")
     # try:
-    if config_bindings:
-        args["config_bindings"]  = config_bindings
+    # if config_bindings:
+    #     args["config_bindings"]  = config_bindings
     assert args["exp_name"] is not None
     config = cfg.Config.from_files_and_bindings(
             args["configs"], args["config_bindings"])
