@@ -187,7 +187,7 @@ class OptionWrapperContinous(gym.Wrapper):
         options_probs = self.softmax(action[:len(self._permitted_zs)+1])
         option_selection_prob = options_probs[:-1].sum()
         low_level_control_prob = 1 - option_selection_prob
-        if self.t%100 == 0:
+        if self.t%500 == 0:
             print(f"Number of options:{len(self._permitted_zs)+1}")
             print(f"actor actions:{action}")
             print(f"options_probs:{options_probs}")
@@ -217,6 +217,11 @@ class OptionWrapperContinous(gym.Wrapper):
             next_state, reward, done, info = self.env.step(action.cpu().detach())
             self.t += 1
             done = False
+            if self.t%500 == 0:
+                print(f"Number of options:{len(self._permitted_zs)+1}")
+                print(f"actor actions:{action}")
+                print(f"options_probs:{options_probs}")
+                print(f"low_level_control_prob:{low_level_control_prob}")
             frames.append(self.env.render("rgb_array"))
             low_level_actions.append(action)
             total_reward += reward
