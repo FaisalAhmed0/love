@@ -304,7 +304,10 @@ class DQNPolicy(nn.Module):
             if len(state.shape) == 1: state=state[None, :]
             mu, log_std = self.continuous_actor(state)
             dist = DiagGaussianDistribution(self.continuous_actor.action_dim)
-            actions, _ = dist.log_prob_from_params(mu,log_std)
+            if test:
+                actions = dist.actions_from_params(mu, log_std, test)
+            else:
+                actions, _ = dist.log_prob_from_params(mu,log_std)
             return epsilon_greedy(actions, epsilon, action_types=self._action_type,action_dim=self._num_actions)[0], None
 
 
