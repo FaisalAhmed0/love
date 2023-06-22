@@ -194,7 +194,7 @@ class Workspace:
                 resume="allow",
                 project="love",
                 config=self.args,
-                name=self.exp_name,
+                name=f"{self.exp_name} with state and actioin encoder decoder",
                 group=self.args["name"],
                 sync_tensorboard=False,
                 settings=wandb.Settings(start_method="fork"),
@@ -247,7 +247,7 @@ class Workspace:
                 embedding_size=self.args["belief_size"],
             )
             self.encoder = modules.D4RlEncoder()
-            self.decoder = GridDecoder(
+            self.decoder = modules.D4RLActionDecoder(
                 input_size=self.args["belief_size"],
                 action_size=self.train_loader.dataset.action_size,
                 feat_size=self.args["belief_size"],

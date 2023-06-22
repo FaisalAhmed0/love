@@ -621,9 +621,10 @@ class D4RLActionEncoder(nn.Module):
         super().__init__()
         self.action_size = action_size
         self.embedding_size = embedding_size
-        self._embedder = nn.Linear(
-            action_size, embedding_size
-        )
+        self._embedder = nn.Sequential (nn.Linear(
+            action_size, 64), nn.ReLU(),
+            nn.Linear(64, embedding_size)
+            )
 
     def forward(self, x):
         return self._embedder(x)
@@ -703,6 +704,20 @@ class Decoder(nn.Module):
     def forward(self, input_data):
         return self.network(self.linear(input_data).unsqueeze(-1).unsqueeze(-1))
 
+
+class D4RLActionDecoder(nn.Module):
+    """Decoder for actions from a latent vector."""
+    def __init__(self, input_size, action_size, feat_size=64):
+        self.network = nn.Sequential(
+            nn.Linear(feat_size, feat_size),
+            nn.ReLU(),
+            nn.Linear(feat_size, feat_size),
+            nn.ReLU(),
+            nn.Linear(feat_size, action_size),
+        )
+
+    def forward(self, input_data):
+        return self.network(self.linear(input_data))
 
 class GridDecoder(nn.Module):
     """Decoder for actions from a latent vector."""
