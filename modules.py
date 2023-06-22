@@ -708,7 +708,7 @@ class Decoder(nn.Module):
 class D4RLActionDecoder(nn.Module):
     """Decoder for actions from a latent vector."""
     def __init__(self, input_size, action_size, feat_size=64):
-        super.__init__()
+        super().__init__()
         self.network = nn.Sequential(
             nn.Linear(feat_size, feat_size),
             nn.ReLU(),
