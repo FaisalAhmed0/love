@@ -151,9 +151,18 @@ def main(params=None, config_bindings=None):
     # args = arg_parser.parse_args()
     args = {
         "configs": ["configs/default.json"],
-        "config_bindings": [],
+        "config_bindings":[
+                            "agent.policy.epsilon_schedule.total_steps=4000",
+                            "checkpoint=\"/home/fmohamed/experiments/maze2d-open-v0_seed_1233/model-20000.ckpt\"",
+                            "threshold=0",
+                            "sparse_reward=True",
+                            "visit_length=3",
+                            "bc=False",
+                            "oracl=False",
+                            "env=\"maze2d-open-v0\""
+                                            ],
         "base_dir": "experiments",
-        "checkpoint": None,
+        "checkpoint": "/home/fmohamed/experiments/maze2d-open-v0_seed_1233/model-20000.ckpt",
         "force_overwrite": False,
         "seed": 1,
         "exp_name": None, # This is a required argument
@@ -162,6 +171,18 @@ def main(params=None, config_bindings=None):
         for key in params:
             args[key] = params[key]
     name = args["exp_name"]
+    # set the seed
+    default_path = args["config_bindings"][1]
+    seed_ind = default_path.index("seed") + 5
+    seed_path = default_path[ :seed_ind ] + str(args["seed"]) + default_path[ default_path[seed_ind:].index("/")+seed_ind:]
+    args["config_bindings"][1] = seed_path
+    print(f"seed:{seed_path}")
+    default_path = args['checkpoint']
+    seed_ind = args['checkpoint'].index("seed") + 5
+    seed_path_checkpoint = default_path[ :seed_ind ] + str(args["seed"]) + default_path[ default_path[seed_ind:].index("/")+seed_ind:]
+    args["checkpoint"] = seed_path_checkpoint
+    print(f"seed_path_checkpoint:{seed_path_checkpoint}")
+    quit()
     # path = args["checkpoint"]
     # args["config_bindings"].append(f"checkpoint=\"{path}\"")
     print(f"name: {name}")

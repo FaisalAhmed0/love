@@ -22,16 +22,6 @@
         "test_resume": false,
         "pre_training": false
   },
-    "config_bindings":[
-      "agent.policy.epsilon_schedule.total_steps=1",
-      "checkpoint=\"/home/fmohamed/experiments/maze2d-open-v0_seed_1233/model-20000.ckpt\"",
-      "threshold=0",
-      "sparse_reward=True",
-      "visit_length=3",
-      "bc=False",
-      "oracl=False",
-      "env=\"maze2d-open-v0\""
-    ],
   "hyperparam_list":[
     {
       "param": "configs",
@@ -42,16 +32,12 @@
       "values":["experiments_finetune"]
     },
     {
-      "param": "checkpoint",
-      "values":["/home/fmohamed/experiments/maze2d-open-v0_seed_1233/model-20000.ckpt"]
-    },
-    {
       "param": "force_overwrite",
       "values":[false]
     },
     {
       "param": "seed",
-      "values":[1233]
+      "values":[1, 1233]
     },
     {
       "param": "exp_name", 
