@@ -13,7 +13,7 @@ import gym
 from torch.nn import functional as F
 import tqdm
 from grid_world import grid
-from distributions import SquashedDiagGaussianDistribution
+from distributions import SquashedDiagGaussianDistribution, DiagGaussianDistribution
 # from world3d import world3d
 
 '''TODO: For the DQNAgent class you should add the following:
@@ -301,7 +301,7 @@ class DQNPolicy(nn.Module):
             # print(f"state shape:{state.shape}")
             if len(state.shape) == 1: state=state[None, :]
             mu, log_std = self.continuous_actor(state)
-            dist = SquashedDiagGaussianDistribution(self.continuous_actor.action_dim)
+            dist = DiagGaussianDistribution(self.continuous_actor.action_dim)
             actions, _ = dist.log_prob_from_params(mu,log_std)
             return epsilon_greedy(actions, epsilon, action_types=self._action_type,action_dim=self._num_actions)[0], None
 
@@ -627,7 +627,7 @@ class Actor_NN(nn.Module):
         self.trunk = nn.Sequential(nn.Linear(inpt_dim, hidden_dim),
                                    nn.LayerNorm(hidden_dim), nn.Tanh())
         self.model = nn.Sequential(
-            nn.Linear(hidden_dim, hidden_dim ), nn.ReLU(),
+            nn.Linear(hidden_dim, hidden_dim ), nn.Tanh(),
         )
         self.head = nn.Linear(hidden_dim, output_dim)
         self.log_std = nn.Linear(hidden_dim, output_dim)

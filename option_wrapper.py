@@ -192,10 +192,10 @@ class OptionWrapperContinous(gym.Wrapper):
         options_probs = self.softmax(action[:len(self._permitted_zs)+1])
         option_selection_prob = options_probs[:-1].sum()
         low_level_control_prob = 1 - option_selection_prob
-        print(f"Number of options:{len(self._permitted_zs)+1}")
-        print(f"actor actions:{action}")
-        print(f"options_probs:{options_probs}")
-        print(f"low_level_control_prob:{low_level_control_prob}")
+        # print(f"Number of options:{len(self._permitted_zs)+1}")
+        # print(f"actor actions:{action}")
+        # print(f"options_probs:{options_probs}")
+        # print(f"low_level_control_prob:{low_level_control_prob}")
         if low_level_control_prob > option_selection_prob:
             state, reward, done, info = self.env.step(action[len(self._permitted_zs)+1:])
             self._current_state = state
