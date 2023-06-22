@@ -197,7 +197,7 @@ class OptionWrapperContinous(gym.Wrapper):
             self._current_state = state
             self.t += 1
             done = False
-            if self.t == 1000:
+            if self.t >= 1000:
                 done = True
             return state, reward, done, info, frames
 
@@ -224,7 +224,7 @@ class OptionWrapperContinous(gym.Wrapper):
                     next_state, action, self._boundary_state)
             state = next_state
             hidden_state = next_hidden_state
-            if self.t == 1000:
+            if self.t >= 1000:
                 done = True
             if done or terminate:
                 break
