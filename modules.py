@@ -710,7 +710,7 @@ class D4RLActionDecoder(nn.Module):
     def __init__(self, input_size, action_size, feat_size=64):
         super().__init__()
         self.network = nn.Sequential(
-            nn.Linear(feat_size, feat_size),
+            nn.Linear(input_size, feat_size),
             nn.ReLU(),
             nn.Linear(feat_size, feat_size),
             nn.ReLU(),
@@ -718,7 +718,7 @@ class D4RLActionDecoder(nn.Module):
         )
 
     def forward(self, input_data):
-        return self.network(self.linear(input_data))
+        return self.network(input_data)
 
 class GridDecoder(nn.Module):
     """Decoder for actions from a latent vector."""
