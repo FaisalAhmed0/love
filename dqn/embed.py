@@ -30,10 +30,13 @@ class Embedder(abc.ABC, nn.Module):
 class IdentityEmbedder(Embedder):
     def __init__(self, embed_dim):
         super().__init__(embed_dim)
+        self.linear =  nn.Sequential(nn.Linear(embed_dim, embed_dim), nn.ReLU(), 
+                                     nn.Linear(embed_dim, embed_dim))
 
     def forward(self, inpt, hidden_state=None):
         # inpt = torch.as_tensor(inpt)
-        return nn.Identity()(inpt), hidden_state
+        # return nn.Identity()(inpt), hidden_state
+        return self.linear(input), hidden_state
     
     @property
     def embed_dim(self):
