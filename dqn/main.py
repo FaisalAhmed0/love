@@ -92,12 +92,13 @@ def run_episode(env, policy, experience_observers=None, test=False,
 
     episode = []
     state = env.reset()
-    state = np.array([2.90749422 , 4.92641686, 0.00, 0.00]).astype(np.float32)
     init_state = (np.array([2.90749422 , 4.92641686 ]), np.array([ 0.00, 0.00]))
         # init_state = (np.array([0.96808476, 6.07712179]), np.array([ 0.00, 0.00]))
     init_state = mujoco_py.cymj.MjSimState(time=0.0,
                                     qpos=init_state[0], qvel=init_state[1], act=None, udd_state={})
     env.sim.set_state(init_state)
+    device = "cuda:0" if torch.cuda.is_available() else "cpu"
+    state = torch.tensor(np.array([2.90749422 , 4.92641686, 0.00, 0.00]).astype(np.float32), device=device)
     timestep = 0
     frames = [env.render("rgb_array")]
     # renders = [maybe_render(env, state[1], None, 0, {}, timestep)]
