@@ -111,20 +111,21 @@ class DQNAgent(object):
                 loss = self._dqn.loss(experiences, np.ones(self._batch_size))
                 loss.backward()
                 self._losses.append(loss.item())
-                # update the actor model 
-                if self._actor_optimizer:
-                    self._actor_optimizer.zero_grad()
-                    actor_loss = self._dqn.actor_loss(experiences)
-                    actor_loss.backward()
-                    self._actor_losses.append(loss.item())
-                    self._actor_optimizer.step()
-
 
                 # clip according to the max allowed grad norm
                 grad_norm = torch_utils.clip_grad_norm_(
                         self._dqn.parameters(), self._max_grad_norm, norm_type=2)
                 self._grad_norms.append(grad_norm.item())
                 self._optimizer.step()
+
+
+                # update the actor model 
+                if self._actor_optimizer:
+                    actor_loss = self._dqn.actor_loss(experiences)
+                    self._actor_optimizer.zero_grad()
+                    actor_loss.backward()
+                    self._actor_losses.append(loss.item())
+                    self._actor_optimizer.step()
 
             if self._updates % self._sync_freq == 0:
                 self._dqn.sync_target()
@@ -346,7 +347,7 @@ class DQNPolicy(nn.Module):
             current_state_q_values1, current_state_q_values2 = self._Q(states, actions)
             
             mu, log_std = self.continuous_actor(torch.stack(next_states))
-            dist = SquashedDiagGaussianDistribution(self.continuous_actor.action_dim)
+            dist = DiagGaussianDistribution(self.continuous_actor.action_dim)
             best_actions, _ = dist.log_prob_from_params(mu,log_std)
             next_state_q_values1, next_state_q_values2  = self._target_Q(next_states, best_actions)
             next_state_q_values = torch.min(next_state_q_values1.squeeze(1), next_state_q_values2.squeeze(1))
@@ -365,7 +366,7 @@ class DQNPolicy(nn.Module):
         states = [e.state for e in experiences]
         # compute actions given states
         mu, log_std = self.continuous_actor(torch.stack(states))
-        dist = SquashedDiagGaussianDistribution(self.continuous_actor.action_dim)
+        dist = DiagGaussianDistribution(self.continuous_actor.action_dim)
         actions, _ = dist.log_prob_from_params(mu,log_std)
         # compute the Q values given the states and actions computed by the actor
         q_values1, q_values2 = self._Q(states, actions)

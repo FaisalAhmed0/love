@@ -18,10 +18,10 @@
     },
     "buffer": {
       "type": "vanilla",
-      "max_buffer_size": 100000
+      "max_buffer_size": 50000
     },
     "learning_rate": 0.0001,
-    "sync_target_freq": 5000,
+    "sync_target_freq": 50000,
     "min_buffer_size": 500,
     "batch_size": 32,
     "update_freq": 4,
