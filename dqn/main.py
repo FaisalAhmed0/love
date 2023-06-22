@@ -322,7 +322,7 @@ def main(params=None, config_bindings=None):
             #                    duration=750, loop=0, optimize=True, quality=20)
 
         
-        if episode_num % 1 == 0:
+        if episode_num % 10 == 0:
             print("Here")
             tb_writer.add_scalar(
                     "reward/train", np.mean(train_rewards), episode_num,
