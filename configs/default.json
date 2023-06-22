@@ -10,7 +10,7 @@
       },
       "embedder": {
         "embed_dim": 4,
-        "embed_dim_action":11
+        "embed_dim_action":13
       },
       "test_epsilon": 0,
       "discount": 0.99,
