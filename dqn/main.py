@@ -22,6 +22,7 @@ import rl
 import utils
 # from world3d import world3d
 import wandb
+import mujoco_py
 
 
 def eval(env, option, hssm, num_eps=10):
@@ -201,8 +202,8 @@ def main(params=None, config_bindings=None):
         id = uid,
         resume="allow",
         project="love",
-        name=f"env:{name}_seed:{seed}_finetune_new_goal",
-        group=f"env:{name}_seed:{seed}_finetune_new_goal",
+        name=f"env:{name}_seed:{seed}_finetune_goal_lower_right",
+        group=f"env:{name}_seed:{seed}_finetune_goal_lower_right",
         sync_tensorboard=False,
         settings=wandb.Settings(start_method="fork"),
     )
@@ -232,6 +233,12 @@ def main(params=None, config_bindings=None):
     #     hssm._output_normal = False
     else:
         env = gym.make(config.get("env"))
+        # Fix the initial state
+        init_state = (np.array([2.90749422 , 4.92641686 ]), np.array([ 0.00, 0.00]))
+        # init_state = (np.array([0.96808476, 6.07712179]), np.array([ 0.00, 0.00]))
+        state = mujoco_py.cymj.MjSimState(time=0.0,
+                                        qpos=init_state[0], qvel=init_state[1], act=None, udd_state={})
+        env.set_state(state)
         train_loader = utils.d4rl_loader(100, config.get("env"))[0]
         hssm.post_obs_state._output_normal = True
         hssm._output_normal = True
