@@ -1,6 +1,6 @@
 {
-  "optimization_procedure_name": "love_finetune_goal_lower_right2",
-    "results_dir": "/fast/fmohamed/love_finetune_goal_lower_right2",
+  "optimization_procedure_name": "_finetune_goal_lower_right1_wiht_options_and_low_level_actions",
+    "results_dir": "/fast/fmohamed/_finetune_goal_lower_right1_wiht_options_and_low_level_actions",
     "git_params": {
       "branch": "main",
       "commit": null
