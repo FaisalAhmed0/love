@@ -92,6 +92,11 @@ def run_episode(env, policy, experience_observers=None, test=False,
 
     episode = []
     state = env.reset()
+    init_state = (np.array([2.90749422 , 4.92641686 ]), np.array([ 0.00, 0.00]))
+        # init_state = (np.array([0.96808476, 6.07712179]), np.array([ 0.00, 0.00]))
+    state = mujoco_py.cymj.MjSimState(time=0.0,
+                                    qpos=init_state[0], qvel=init_state[1], act=None, udd_state={})
+    env.sim.set_state(state)
     timestep = 0
     frames = [env.render("rgb_array")]
     # renders = [maybe_render(env, state[1], None, 0, {}, timestep)]
