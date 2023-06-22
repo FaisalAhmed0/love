@@ -209,7 +209,7 @@ def main(params=None, config_bindings=None):
         id = uid,
         resume="allow",
         project="love",
-        name=f"env:{name}_seed:{seed}_finetune_goal_lower_right1_wiht_options only",
+        name=f"env:{name}_seed:{seed}_finetune_goal_lower_right1_wiht_options_sqashed_guassian",
         group=f"env:{name}_finetune_goal_lower_right",
         sync_tensorboard=False,
         settings=wandb.Settings(start_method="fork"),
@@ -339,7 +339,7 @@ def main(params=None, config_bindings=None):
             for k, v in agent.stats.items():
                 if v is not None:
                     tb_writer.add_scalar(k, v, episode_num, total_steps)
-                    
+
         if episode_num % 10 == 0:
             render = np.transpose(np.array(render),(0,3,1,2))
             wandb.log({'eval/video': wandb.Video(render[::8,:,::2,::2], fps=6,format="gif")}, step=total_steps)

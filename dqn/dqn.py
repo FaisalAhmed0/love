@@ -303,7 +303,7 @@ class DQNPolicy(nn.Module):
             # print(f"state shape:{state.shape}")
             if len(state.shape) == 1: state=state[None, :]
             mu, log_std = self.continuous_actor(state)
-            dist = DiagGaussianDistribution(self.continuous_actor.action_dim)
+            dist = SquashedDiagGaussianDistribution(self.continuous_actor.action_dim)
             if test:
                 actions = dist.actions_from_params(mu, log_std, test)
             else:
@@ -350,7 +350,7 @@ class DQNPolicy(nn.Module):
             current_state_q_values1, current_state_q_values2 = self._Q(states, actions)
             
             mu, log_std = self.continuous_actor(torch.stack(next_states))
-            dist = DiagGaussianDistribution(self.continuous_actor.action_dim)
+            dist = SquashedDiagGaussianDistribution(self.continuous_actor.action_dim)
             best_actions, _ = dist.log_prob_from_params(mu,log_std)
             next_state_q_values1, next_state_q_values2  = self._target_Q(next_states, best_actions)
             next_state_q_values = torch.min(next_state_q_values1.squeeze(1), next_state_q_values2.squeeze(1))
@@ -369,7 +369,7 @@ class DQNPolicy(nn.Module):
         states = [e.state for e in experiences]
         # compute actions given states
         mu, log_std = self.continuous_actor(torch.stack(states))
-        dist = DiagGaussianDistribution(self.continuous_actor.action_dim)
+        dist = SquashedDiagGaussianDistribution(self.continuous_actor.action_dim)
         actions, _ = dist.log_prob_from_params(mu,log_std)
         # compute the Q values given the states and actions computed by the actor
         q_values1, q_values2 = self._Q(states, actions)
@@ -632,7 +632,7 @@ class Actor_NN(nn.Module):
         self.trunk = nn.Sequential(nn.Linear(inpt_dim, hidden_dim),
                                    nn.LayerNorm(hidden_dim), nn.Tanh())
         self.model = nn.Sequential(
-            nn.Linear(hidden_dim, hidden_dim ), nn.Tanh(),
+            nn.Linear(hidden_dim, hidden_dim ), nn.ReLU(),
         )
         self.head = nn.Linear(hidden_dim, output_dim)
         self.log_std = nn.Linear(hidden_dim, output_dim)
