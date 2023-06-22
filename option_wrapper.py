@@ -172,9 +172,10 @@ class OptionWrapperContinous(gym.Wrapper):
 
         # Action space is default low-level actions + options
         self.action_space = spaces.Discrete(
-                 len(self._permitted_zs)+1, env.action_space.shape[0])
+                 len(self._permitted_zs)+1+env.action_space.shape[0])
         
         print(f"Continous action shape:{ env.action_space.shape[0]}")
+        print(f"number of options:{ len(self._permitted_zs)+1}")
         print(f"Action space of the augmetnted enviornment :{self.action_space.n}")
 
         self._current_state = None
