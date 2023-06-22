@@ -172,7 +172,7 @@ class OptionWrapperContinous(gym.Wrapper):
 
         # Action space is default low-level actions + options
         self.action_space = spaces.Discrete(
-                 len(self._permitted_zs)+1+env.action_space.shape[0])
+                 len(self._permitted_zs))
         
         print(f"Continous action shape:{ env.action_space.shape[0]}")
         print(f"number of options:{ len(self._permitted_zs)+1}")
@@ -190,24 +190,25 @@ class OptionWrapperContinous(gym.Wrapper):
         # compute the porbability of the complement
         # print(action)
         options_probs = self.softmax(action[:len(self._permitted_zs)+1])
-        option_selection_prob = options_probs[:-1].sum()
-        low_level_control_prob = 1 - option_selection_prob
+        # option_selection_prob = options_probs[:-1].sum()
+        # low_level_control_prob = 1 - option_selection_prob
+        options_probs = self.softmax(action)
         # print(f"Number of options:{len(self._permitted_zs)+1}")
         # print(f"actor actions:{action}")
         # print(f"options_probs:{options_probs}")
         # print(f"low_level_control_prob:{low_level_control_prob}")
-        if low_level_control_prob > option_selection_prob:
-            state, reward, done, info = self.env.step(action[len(self._permitted_zs)+1:])
-            self._current_state = state
-            self.t += 1
-            done = False
-            if self.t >= 1000:
-                done = True
-            return state, reward, done, info, frames
+        # if low_level_control_prob > option_selection_prob:
+        #     state, reward, done, info = self.env.step(action[len(self._permitted_zs)+1:])
+        #     self._current_state = state
+        #     self.t += 1
+        #     done = False
+        #     if self.t >= 1000:
+        #         done = True
+        #     return state, reward, done, info, frames
 
         # Taking an option as an action
         # Follows the option until the option terminates
-        option = options_probs[:-1].argmax()
+        option = options_probs.argmax()
         z = self._permitted_zs[option]
         state = self._current_state
         total_reward = 0  # accumulate all rewards during option
