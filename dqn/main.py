@@ -92,7 +92,7 @@ def run_episode(env, policy, experience_observers=None, test=False,
 
     episode = []
     state = env.reset()
-    state = np.array([2.90749422 , 4.92641686, 0.00, 0.00])
+    state = np.array([2.90749422 , 4.92641686, 0.00, 0.00]).astype(np.float32)
     init_state = (np.array([2.90749422 , 4.92641686 ]), np.array([ 0.00, 0.00]))
         # init_state = (np.array([0.96808476, 6.07712179]), np.array([ 0.00, 0.00]))
     init_state = mujoco_py.cymj.MjSimState(time=0.0,
