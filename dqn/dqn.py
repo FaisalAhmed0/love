@@ -561,7 +561,6 @@ class NNDQN(DQN):
         
         
         state_embed, _ = self._state_embedder(torch.stack(states))
-        
         action_embed, _ = self._action_embedder((actions))
         x = self.trunk(torch.cat([state_embed, action_embed], dim=1))
         x1 = self.q1(x)
