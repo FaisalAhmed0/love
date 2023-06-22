@@ -1,6 +1,6 @@
 {
-  "optimization_procedure_name": "finetune_goal_lower_right",
-    "results_dir": "/fast/fmohamed/finetune_goal_lower_right",
+  "optimization_procedure_name": "finetune_goal_lower_left",
+    "results_dir": "/fast/fmohamed/finetune_goal_lower_left",
     "git_params": {
       "branch": "main",
       "commit": null
@@ -40,7 +40,7 @@
     },
     {
       "param": "exp_name", 
-      "values":["finetune_goal_lower_right"]
+      "values":["finetune_goal_lower_left"]
     }
   ]
 }
