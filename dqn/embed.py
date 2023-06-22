@@ -36,7 +36,7 @@ class IdentityEmbedder(Embedder):
     def forward(self, inpt, hidden_state=None):
         # inpt = torch.as_tensor(inpt)
         # return nn.Identity()(inpt), hidden_state
-        return self.linear(input), hidden_state
+        return self.linear(inpt), hidden_state
     
     @property
     def embed_dim(self):
