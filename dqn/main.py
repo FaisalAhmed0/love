@@ -322,8 +322,7 @@ def main(params=None, config_bindings=None):
             #                    duration=750, loop=0, optimize=True, quality=20)
 
         
-        if episode_num % 10 == 0:
-            print("Here")
+        if episode_num % 1 == 0:
             tb_writer.add_scalar(
                     "reward/train", np.mean(train_rewards), episode_num,
                     total_steps)
@@ -337,13 +336,15 @@ def main(params=None, config_bindings=None):
             wandb_writer.add_scalar(
                     "reward/test", np.mean(test_rewards), episode_num,
                     total_steps)
-            
-            render = np.transpose(np.array(render),(0,3,1,2))
-            wandb.log({'eval/video': wandb.Video(render[::8,:,::2,::2], fps=6,format="gif")}, step=total_steps)
-            
             for k, v in agent.stats.items():
                 if v is not None:
                     tb_writer.add_scalar(k, v, episode_num, total_steps)
+                    
+        if episode_num % 10 == 0:
+            render = np.transpose(np.array(render),(0,3,1,2))
+            wandb.log({'eval/video': wandb.Video(render[::8,:,::2,::2], fps=6,format="gif")}, step=total_steps)
+            
+            
         if total_steps >= 100000:
             break
 
